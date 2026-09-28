@@ -19,13 +19,13 @@ const IS_DEV = ENV === 'development'
 // EAS layihəsi: @azeraskerov/alcostore
 const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID || '100319b1-a3a2-46cd-9d72-ec96408f968e'
 
-// alcostorebaku.az hazır olana qədər workers.dev (eas.json env-i üstünlük təşkil edir)
+// alcostorebaku.az hazır olana qədər müvəqqəti turmat.az domenləri (eas.json env-i üstünlük təşkil edir)
 const API_URL =
   process.env.EXPO_PUBLIC_API_URL ||
-  (IS_DEV ? 'https://alcostore-api-dev.sigortamat90.workers.dev' : 'https://alcostore-api.sigortamat90.workers.dev')
+  (IS_DEV ? 'https://alcostore-api-dev.sigortamat90.workers.dev' : 'https://alco.turmat.az')
 const WEB_URL =
   process.env.EXPO_PUBLIC_WEB_URL ||
-  (IS_DEV ? 'https://alcostore-web-dev.sigortamat90.workers.dev' : 'https://alcostore-web.sigortamat90.workers.dev')
+  (IS_DEV ? 'https://alcostore-web-dev.sigortamat90.workers.dev' : 'https://alcoweb.turmat.az')
 
 const fs = require('fs')
 const path = require('path')
