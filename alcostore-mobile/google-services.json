@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "551958341506",
+    "project_id": "alcostore-485c7",
+    "storage_bucket": "alcostore-485c7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551958341506:android:6e12f9ce9bf127ecf6919b",
+        "android_client_info": {
+          "package_name": "app.alcostore.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmUivq2EcxZYgdqJOIM96adS3hrZypJGs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
