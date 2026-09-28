@@ -1,17 +1,16 @@
 name: Deploy Web + API to Cloudflare
 
-# TurMat/.github/workflows/deploy-web.yml əsasında:
-#   development → dev   ·  main → production
+# TurMat/.github/workflows/deploy-web.yml əsasında. Dev mühiti YOXDUR — yalnız main → production.
 # Sıra: API bundle dry-run → D1 migrations → API Worker deploy → web (OpenNext) build → web Worker deploy → smoke test.
 # Web build API deploy-dan SONRA gedir ki, web xətası API düzəlişlərini saxlamasın (TurMat dərsi).
 #
-# URL-lər repo dəyişənlərindən gəlir (Settings → Variables). alcostorebaku.az hazır olana qədər
-# defolt workers.dev ünvanlarıdır; domen qoşulanda yalnız dəyişənlər yenilənir:
-#   DEV_API_URL, DEV_WEB_URL, PROD_API_URL, PROD_WEB_URL
+# Web build URL-ləri repo dəyişənlərindən (Settings → Variables): PROD_API_URL, PROD_WEB_URL.
+# Defolt müvəqqəti turmat.az domenləridir; alcostorebaku.az qoşulanda yalnız dəyişənlər yenilənir.
+# API-nin öz URL/CORS dəyərləri api/wrangler.toml [vars]-dadır (tək mənbə) — burada override edilmir.
 
 on:
   push:
-    branches: [development, main]
+    branches: [main]
     paths:
       - 'alcostore-web/**'
       - 'api/**'
@@ -41,21 +40,10 @@ jobs:
       - name: Determine environment
         id: env
         run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-            echo "env_flag=" >> $GITHUB_OUTPUT
-            echo "api_url=${{ vars.PROD_API_URL || 'https://alcostore-api.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcostore-web.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_PROD }}" >> $GITHUB_OUTPUT
-            echo "migrate=migrate:prod" >> $GITHUB_OUTPUT
-          else
-            echo "environment=development" >> $GITHUB_OUTPUT
-            echo "env_flag=--env dev" >> $GITHUB_OUTPUT
-            echo "api_url=${{ vars.DEV_API_URL || 'https://alcostore-api-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "web_url=${{ vars.DEV_WEB_URL || 'https://alcostore-web-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_DEV }}" >> $GITHUB_OUTPUT
-            echo "migrate=migrate:dev" >> $GITHUB_OUTPUT
-          fi
+          echo "environment=production" >> $GITHUB_OUTPUT
+          echo "api_url=${{ vars.PROD_API_URL || 'https://alco.turmat.az' }}" >> $GITHUB_OUTPUT
+          echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcoweb.turmat.az' }}" >> $GITHUB_OUTPUT
+          echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_PROD }}" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v4
         with:
@@ -70,20 +58,15 @@ jobs:
       # wrangler deploy API-nin YEGANƏ build addımıdır — sınıq import-u prod-dan əvvəl tutmaq üçün
       - name: Verify API bundle (dry-run)
         working-directory: api
-        run: npx wrangler deploy ${{ steps.env.outputs.env_flag }} --dry-run --outdir=.wrangler/dry-run
+        run: npx wrangler deploy --dry-run --outdir=.wrangler/dry-run
 
       - name: Run D1 migrations
         working-directory: api
-        run: npm run ${{ steps.env.outputs.migrate }}
+        run: npm run migrate:prod
 
       - name: Deploy API Worker
         working-directory: api
-        run: |
-          npx wrangler deploy ${{ steps.env.outputs.env_flag }} \
-            --var API_BASE_URL:${{ steps.env.outputs.api_url }} \
-            --var R2_PUBLIC_URL:${{ steps.env.outputs.api_url }}/media \
-            --var FRONTEND_URL:${{ steps.env.outputs.web_url }} \
-            --var CORS_ORIGINS:${{ steps.env.outputs.web_url }}
+        run: npx wrangler deploy
 
       - name: Build web (OpenNext)
         working-directory: alcostore-web
@@ -98,7 +81,7 @@ jobs:
 
       - name: Deploy web Worker
         working-directory: alcostore-web
-        run: npx opennextjs-cloudflare deploy ${{ steps.env.outputs.env_flag }}
+        run: npx opennextjs-cloudflare deploy
 
       # TurMat-dakı "boş səhifə deploy olunmasın" qapısının sadə forması
       - name: Smoke test

@@ -3,14 +3,13 @@ name: Deploy Mobile (EAS Update)
 # TurMat/.github/workflows/deploy-mobile.yml əsasında:
 # yalnız JS/TS dəyişibsə → eas update (development / production kanalı);
 # native fayllar dəyişibsə → update YOX, "manual EAS build lazımdır" xəbərdarlığı.
+# Dev mühiti YOXDUR — yalnız production kanalı.
+#
+# Hələlik yalnız əl ilə (workflow_dispatch): ilk production EAS build-dən (Play Store Addım 4) əvvəl
+# update göndərməyin mənası yoxdur. Build-dən sonra push trigger-i açılacaq:
+#   push: { branches: [main], paths: ['alcostore-mobile/**', 'packages/shared/**', '.github/workflows/deploy-mobile.yml'] }
 
 on:
-  push:
-    branches: [development, main]
-    paths:
-      - 'alcostore-mobile/**'
-      - 'packages/shared/**'
-      - '.github/workflows/deploy-mobile.yml'
   workflow_dispatch: {}
 
 jobs:
@@ -37,15 +36,9 @@ jobs:
           else
             echo "native=false" >> $GITHUB_OUTPUT
           fi
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "channel=production" >> $GITHUB_OUTPUT
-            echo "api_url=${{ vars.PROD_API_URL || 'https://alcostore-api.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcostore-web.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-          else
-            echo "channel=development" >> $GITHUB_OUTPUT
-            echo "api_url=${{ vars.DEV_API_URL || 'https://alcostore-api-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-            echo "web_url=${{ vars.DEV_WEB_URL || 'https://alcostore-web-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
-          fi
+          echo "channel=production" >> $GITHUB_OUTPUT
+          echo "api_url=${{ vars.PROD_API_URL || 'https://alco.turmat.az' }}" >> $GITHUB_OUTPUT
+          echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcoweb.turmat.az' }}" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v4
         if: steps.changes.outputs.native == 'false'
