@@ -50,7 +50,7 @@ const config = {
     ...(has('GoogleService-Info.plist') ? { googleServicesFile: './GoogleService-Info.plist' } : {}),
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-      NSUserSupportURL: 'https://alcostorebaku.az/support',
+      NSUserSupportURL: 'https://alcoweb.turmat.az/support',
       // WhatsApp-ın quraşdırılıb-quraşdırılmadığını yoxlamaq üçün
       LSApplicationQueriesSchemes: ['whatsapp'],
     },
