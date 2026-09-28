@@ -1,0 +1,36 @@
+{
+  "name": "alcostore-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "build:pages": "npm run build && opennextjs-cloudflare build --skipNextBuild",
+    "prepare:pages": "node scripts/prepare-pages.mjs",
+    "deploy:dev": "npm run build:pages && npm run prepare:pages && wrangler pages deploy .open-next/assets --project-name=alcostore-web-dev",
+    "deploy:prod": "npm run build:pages && npm run prepare:pages && wrangler pages deploy .open-next/assets --project-name=alcostore-web"
+  },
+  "dependencies": {
+    "@alcostore/shared": "*",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.552.0",
+    "next": "16.3.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.6",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "typescript": "~5.9.2",
+    "wrangler": "^4.143.0"
+  }
+}

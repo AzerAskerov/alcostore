@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+/* Dizayn tokenləri — packages/shared/src/tokens.ts ilə eyni. Yalnız tünd tema. */
+@theme {
+  --color-page: #050403;
+  --color-bg: #0e0c0b;
+  --color-bar: #100e0d;
+  --color-surface: #171413;
+  --color-surface2: #1f1a18;
+  --color-text: #f2ede7;
+  --color-text2: #e4dcd4;
+  --color-text3: #c9c0b8;
+  --color-muted: #9b918a;
+  --color-faint: #6e635c;
+  --color-red: #e31e24;
+  --color-on-red: #fff3f2;
+  --color-gold: #d9a441;
+  --color-gold-hover: #d8a855;
+  --color-wa: #25d366;
+  --color-on-wa: #07320f;
+  --color-wa-box: #111b14;
+  --color-wa-text: #cfe8d6;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --radius-btn: 14px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 11px;
+}
+
+.glow-red {
+  box-shadow: 0 0 24px rgb(227 30 36 / 0.35);
+}
+
+.promo {
+  background: linear-gradient(135deg, #1b0f10, #241315);
+  border: 1px solid rgb(227 30 36 / 0.45);
+  box-shadow: inset 0 0 40px rgb(227 30 36 / 0.12);
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.admin input,
+.admin select,
+.admin textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--color-text);
+  width: 100%;
+}
+.admin input:focus,
+.admin select:focus,
+.admin textarea:focus {
+  outline: none;
+  border-color: var(--color-gold);
+}
+.admin label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+.admin input[type='checkbox'] {
+  width: auto;
+}
