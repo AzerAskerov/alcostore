@@ -12,7 +12,7 @@
 | Repo | `github.com/AzerAskerov/alcostore` (PUBLIC). `development` və `main` push olunub (main = prod). Köhnə dizayn `index.html` main-də qalır (GitHub Pages). Secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`; environment `production-mobile` yaradılıb |
 | Prod API | Cloudflare Worker `alcostore-api` → **https://alco.turmat.az** (custom domain, turmat.az zonası). D1 `alcostoreDb` (migrations 0001–0004), R2 `alcostore-imgs` (26 şəkil). SSL OK (Google TS, 2026-12-27-dək, avto-yenilənir). ✅ Addım 0 |
 | Prod veb | ✅ **https://alcoweb.turmat.az** (Worker `alcostore-web`, OpenNext) — GitHub Actions `deploy-web.yml` ilə (main push). Deploy YALNIZ workflow ilə, lokal `wrangler deploy` yox. Privacy/support/data-deletion URL-ləri buradadır |
-| Mobil | Expo SDK 57, `alcostore-mobile/`. EAS layihəsi `@azeraskerov/alcostore` (projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`). Android package `app.alcostore.android`. Heç bir EAS build edilməyib. Lokal Expo Go testi keçib |
+| Mobil | Expo SDK 57, `alcostore-mobile/`. EAS layihəsi `@azeraskerov/alcostore` (projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`). Android package `app.alcostore.android`. EAS keystore + FCM V1 qurulub (Firebase `alcostore-485c7`); heç bir EAS build edilməyib. Lokal Expo Go testi keçib |
 | Hesablar | TurMat-ın Apple / Google Play / Expo (`azeraskerov`) / Cloudflare (account `a151fd414815484846a2be6cbc8b8b48`) hesabları istifadə olunur — yeni hesab açılmır |
 | Son domen | `alcostorebaku.az` (alınma prosesi davam edir). Keçid: wrangler route + EXPO_PUBLIC_API_URL (EAS Update kifayətdir) |
 
