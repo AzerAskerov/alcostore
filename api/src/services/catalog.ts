@@ -18,7 +18,7 @@ export function imageUrl(publicBase: string, key: string | null | undefined): st
   return `${publicBase.replace(/\/$/, '')}/${key}`
 }
 
-export function mapCategory(r: Row): Category {
+export function mapCategory(r: Row, publicBase = ''): Category {
   return {
     id: Number(r.id),
     slug: String(r.slug),
@@ -27,6 +27,7 @@ export function mapCategory(r: Row): Category {
     sort: Number(r.sort),
     is_active: Boolean(r.is_active),
     ...(r.product_count !== undefined ? { product_count: Number(r.product_count) } : {}),
+    ...(r.cover_key !== undefined ? { image_url: imageUrl(publicBase, r.cover_key as string) } : {}),
   }
 }
 
@@ -68,14 +69,23 @@ export function pickDisplayVariant(variants: ProductVariant[]): ProductVariant |
   return [...pool].sort((a, b) => a.price - b.price)[0]
 }
 
-export async function listCategories(db: D1Database, includeInactive = false): Promise<Category[]> {
+/**
+ * Müştəri üçün (`includeInactive=false`) yalnız aktiv və içində aktiv məhsul olan kateqoriyalar qaytarılır —
+ * boş kateqoriya göstərilmir. Admin hamısını görür.
+ */
+export async function listCategories(db: D1Database, publicBase: string, includeInactive = false): Promise<Category[]> {
   const { results } = await db
     .prepare(
-      `SELECT c.*, (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_active = 1) AS product_count
+      `SELECT c.*,
+         (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_active = 1) AS product_count,
+         (SELECT pi.r2_key FROM product_images pi JOIN products p ON p.id = pi.product_id
+           WHERE p.category_id = c.id AND p.is_active = 1
+           ORDER BY p.is_featured DESC, p.sort, p.id, pi.sort LIMIT 1) AS cover_key
        FROM categories c ${includeInactive ? '' : 'WHERE c.is_active = 1'} ORDER BY c.sort, c.id`,
     )
     .all()
-  return results.map(mapCategory)
+  const cats = results.map((r) => mapCategory(r, publicBase))
+  return includeInactive ? cats : cats.filter((c) => (c.product_count ?? 0) > 0)
 }
 
 async function variantsFor(db: D1Database, productIds: number[], includeInactive: boolean) {

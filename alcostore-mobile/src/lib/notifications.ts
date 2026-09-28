@@ -1,41 +1,61 @@
+import { isRunningInExpoGo } from 'expo'
 import * as Device from 'expo-device'
-import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
 import { api } from './api'
 import { APP_VERSION, EAS_PROJECT_ID } from './config'
 import { prefsStore } from './stores'
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-})
+type NotificationsModule = typeof import('expo-notifications')
+
+/**
+ * Expo Go (SDK 53+) Android-də remote push-u dəstəkləmir və `expo-notifications` import olunanda xəta atır.
+ * Ona görə modulu yalnız dev/store build-də tənbəl (lazy) yükləyirik; Expo Go-da push sadəcə söndürülür,
+ * qalan hər şey işləyir.
+ */
+export const PUSH_SUPPORTED = !isRunningInExpoGo()
+
+let mod: NotificationsModule | null | undefined
+function N(): NotificationsModule | null {
+  if (mod !== undefined) return mod
+  if (!PUSH_SUPPORTED) return (mod = null)
+  mod = require('expo-notifications') as NotificationsModule
+  mod.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  })
+  return mod
+}
 
 const platform = Platform.OS === 'ios' ? 'ios' : 'android'
 
 async function ensureAndroidChannel() {
-  if (Platform.OS !== 'android') return
-  await Notifications.setNotificationChannelAsync('default', {
+  const n = N()
+  if (!n || Platform.OS !== 'android') return
+  await n.setNotificationChannelAsync('default', {
     name: 'Kampaniyalar və yeniliklər',
-    importance: Notifications.AndroidImportance.HIGH,
+    importance: n.AndroidImportance.HIGH,
     lightColor: '#E31E24',
   })
 }
 
-export type PushPermission = 'granted' | 'denied' | 'undetermined'
+export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupported'
 
 export async function getPushPermission(): Promise<PushPermission> {
-  const { status } = await Notifications.getPermissionsAsync()
+  const n = N()
+  if (!n) return 'unsupported'
+  const { status } = await n.getPermissionsAsync()
   return status as PushPermission
 }
 
 async function getToken(): Promise<string | null> {
-  if (!Device.isDevice || !EAS_PROJECT_ID || EAS_PROJECT_ID.startsWith('REPLACE')) return null
+  const n = N()
+  if (!n || !Device.isDevice || !EAS_PROJECT_ID) return null
   try {
-    const { data } = await Notifications.getExpoPushTokenAsync({ projectId: EAS_PROJECT_ID })
+    const { data } = await n.getExpoPushTokenAsync({ projectId: EAS_PROJECT_ID })
     return data
   } catch (e) {
     console.warn('[push] token alınmadı', e)
@@ -64,22 +84,41 @@ export async function syncDevice(): Promise<void> {
 
 /** İstifadəçi "İcazə ver" basanda sistem pəncərəsini açır. */
 export async function requestPushPermission(): Promise<PushPermission> {
+  const n = N()
+  if (!n) return 'unsupported'
   await ensureAndroidChannel()
-  const { status } = await Notifications.requestPermissionsAsync()
+  const { status } = await n.requestPermissionsAsync()
   prefsStore.set((p) => ({ ...p, pushPromptDismissed: true, pushEnabled: status === 'granted' }))
   await syncDevice()
   return status as PushPermission
 }
 
 export async function setPushEnabled(enabled: boolean): Promise<PushPermission> {
+  if (!N()) return 'unsupported'
   if (enabled && (await getPushPermission()) !== 'granted') return requestPushPermission()
   prefsStore.set((p) => ({ ...p, pushEnabled: enabled }))
   await syncDevice()
   return getPushPermission()
 }
 
-/** Bildirişin data.link-i ("/mehsul/..."), tətbiq daxilində açmaq üçün. */
-export function linkFromNotification(n: Notifications.Notification | null | undefined): string | null {
-  const link = n?.request.content.data?.link
+function linkFrom(data: unknown): string | null {
+  const link = (data as { link?: unknown } | undefined)?.link
   return typeof link === 'string' && link.startsWith('/') ? link : null
+}
+
+/**
+ * Bildirişə toxunanda data.link-i ("/mehsul/...") qaytarır.
+ * Soyuq açılış (tətbiq bağlı ikən toxunma) və tətbiq açıq ikən toxunma hər ikisi işləyir.
+ */
+export function onNotificationLink(cb: (link: string) => void): () => void {
+  const n = N()
+  if (!n) return () => {}
+  const last = n.getLastNotificationResponse()
+  const initial = linkFrom(last?.notification.request.content.data)
+  if (initial) cb(initial)
+  const sub = n.addNotificationResponseReceivedListener((r) => {
+    const link = linkFrom(r.notification.request.content.data)
+    if (link) cb(link)
+  })
+  return () => sub.remove()
 }

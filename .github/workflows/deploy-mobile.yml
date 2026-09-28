@@ -1,0 +1,85 @@
+name: Deploy Mobile (EAS Update)
+
+# TurMat/.github/workflows/deploy-mobile.yml əsasında:
+# yalnız JS/TS dəyişibsə → eas update (development / production kanalı);
+# native fayllar dəyişibsə → update YOX, "manual EAS build lazımdır" xəbərdarlığı.
+
+on:
+  push:
+    branches: [development, main]
+    paths:
+      - 'alcostore-mobile/**'
+      - 'packages/shared/**'
+      - '.github/workflows/deploy-mobile.yml'
+  workflow_dispatch: {}
+
+jobs:
+  smart-deploy:
+    name: Smart Deploy (Update or Build Warning)
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          NATIVE="alcostore-mobile/(package\.json|app\.config\.js|eas\.json|assets/|plugins/)"
+          CHANGED=$(git diff --name-only HEAD~1 HEAD || true)
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -Eq "$NATIVE"; then
+            echo "native=true" >> $GITHUB_OUTPUT
+          else
+            echo "native=false" >> $GITHUB_OUTPUT
+          fi
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "channel=production" >> $GITHUB_OUTPUT
+            echo "api_url=${{ vars.PROD_API_URL || 'https://alcostore-api.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcostore-web.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+          else
+            echo "channel=development" >> $GITHUB_OUTPUT
+            echo "api_url=${{ vars.DEV_API_URL || 'https://alcostore-api-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "web_url=${{ vars.DEV_WEB_URL || 'https://alcostore-web-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.native == 'false'
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - uses: expo/expo-github-action@v8
+        if: steps.changes.outputs.native == 'false'
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install
+        if: steps.changes.outputs.native == 'false'
+        run: npm ci --ignore-scripts
+
+      - name: Publish EAS Update
+        if: steps.changes.outputs.native == 'false'
+        working-directory: alcostore-mobile
+        env:
+          CI: 1
+          EXPO_PUBLIC_ENV: ${{ steps.changes.outputs.channel }}
+          EXPO_PUBLIC_API_URL: ${{ steps.changes.outputs.api_url }}
+          EXPO_PUBLIC_WEB_URL: ${{ steps.changes.outputs.web_url }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          eas update --branch ${{ steps.changes.outputs.channel }} --message "${COMMIT_MSG%%$'\n'*}" --platform android --non-interactive
+          eas update --branch ${{ steps.changes.outputs.channel }} --message "${COMMIT_MSG%%$'\n'*}" --platform ios --non-interactive
+
+      - name: Warn about native changes
+        if: steps.changes.outputs.native == 'true'
+        run: |
+          echo "::warning::Native dəyişiklik var — EAS Update göndərilmədi. Yeni build lazımdır:"
+          echo "::warning::  cd alcostore-mobile && eas build --profile ${{ steps.changes.outputs.channel }} --platform all"
+          echo "::warning::və ya store üçün: Actions → Release Mobile to Stores"

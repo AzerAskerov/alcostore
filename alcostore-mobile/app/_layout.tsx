@@ -2,14 +2,13 @@ import { DMMono_400Regular, DMMono_500Medium } from '@expo-google-fonts/dm-mono'
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans'
 import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from '@expo-google-fonts/instrument-serif'
 import { useFonts } from 'expo-font'
-import * as Notifications from 'expo-notifications'
 import { router, Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import * as SystemUI from 'expo-system-ui'
 import { useEffect, useState } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { linkFromNotification, syncDevice } from '@/lib/notifications'
+import { onNotificationLink, syncDevice } from '@/lib/notifications'
 import { hydrateAll, prefsStore } from '@/lib/stores'
 import { colors, font } from '@/theme'
 
@@ -28,7 +27,6 @@ export default function RootLayout() {
   })
   const [hydrated, setHydrated] = useState(false)
   const prefs = prefsStore.use()
-  const lastResponse = Notifications.useLastNotificationResponse()
 
   useEffect(() => {
     hydrateAll().finally(() => setHydrated(true))
@@ -45,11 +43,11 @@ export default function RootLayout() {
     if (ready && prefs.ageConfirmed) syncDevice()
   }, [ready, prefs.ageConfirmed])
 
-  // Bildirişə toxunanda linki aç
+  // Bildirişə toxunanda linki aç (Expo Go-da push yoxdur — funksiya boş qaytarır)
   useEffect(() => {
-    const link = linkFromNotification(lastResponse?.notification)
-    if (ready && prefs.ageConfirmed && link) router.push(link as never)
-  }, [ready, prefs.ageConfirmed, lastResponse])
+    if (!ready || !prefs.ageConfirmed) return
+    return onNotificationLink((link) => router.push(link as never))
+  }, [ready, prefs.ageConfirmed])
 
   if (!ready) return null
 

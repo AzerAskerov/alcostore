@@ -43,7 +43,7 @@ export default async function ProductPage({ params }: Props) {
       </Link>
       <div className="mt-4 grid gap-8 md:grid-cols-2 md:gap-14">
         <div className="relative aspect-square overflow-hidden rounded-[18px] border border-line bg-gradient-to-b from-[#2A201A] to-[#14100E]">
-          <ProductImage url={product.images[0]?.url} category={product.category_slug} name={product.name} className="p-6" />
+          <ProductImage url={product.images[0]?.url} category={product.category_slug} name={product.name} fit="contain" />
           <span className="absolute right-4 top-4 rounded-full border border-line-strong px-2 py-0.5 font-mono text-xs text-text3">18+</span>
         </div>
         <div>

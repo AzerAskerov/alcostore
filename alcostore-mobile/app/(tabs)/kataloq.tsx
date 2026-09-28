@@ -2,7 +2,7 @@ import { router } from 'expo-router'
 import { ChevronRight, Heart, Search } from 'lucide-react-native'
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { BottleArt } from '@/components/BottleArt'
+import { ProductImage } from '@/components/ProductImage'
 import { ErrorState, Loading, Screen, T } from '@/components/ui'
 import { api } from '@/lib/api'
 import { favoritesStore } from '@/lib/stores'
@@ -44,7 +44,7 @@ export default function Catalog() {
               onPress={() => router.push({ pathname: '/kateqoriya/[slug]', params: { slug: c.slug } })}
               style={s.cat}
             >
-              <BottleArt category={c.slug} width={56} height={92} />
+              <ProductImage url={c.image_url} category={c.slug} style={s.catImg} />
               <View style={{ flex: 1 }}>
                 <T style={{ fontFamily: font.serif, fontSize: 24 }}>{c.name_az}</T>
                 <T variant="mono">{c.product_count} məhsul</T>
@@ -62,5 +62,6 @@ const s = StyleSheet.create({
   search: { height: 44, borderRadius: radii.input, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14 },
   fav: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12, padding: 14, borderRadius: radii.card, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   grid: { gap: 10, marginTop: 16 },
-  cat: { flexDirection: 'row', alignItems: 'center', gap: 16, padding: 12, borderRadius: radii.card, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  cat: { flexDirection: 'row', alignItems: 'center', gap: 16, padding: 10, borderRadius: radii.card, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  catImg: { width: 72, height: 90, borderRadius: 10, backgroundColor: colors.surface2 },
 })

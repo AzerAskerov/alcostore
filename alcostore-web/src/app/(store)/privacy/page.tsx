@@ -9,7 +9,7 @@ export default async function PrivacyPage() {
   return (
     <LegalPage title="Məxfilik siyasəti" updated="28.09.2026">
       <p>
-        Bu siyasət {s.store_name} mobil tətbiqi və {`alcostore.az`} saytı (bundan sonra “Xidmət”) tərəfindən hansı
+        Bu siyasət {s.store_name} mobil tətbiqi və {`alcostorebaku.az`} saytı (bundan sonra “Xidmət”) tərəfindən hansı
         məlumatların toplandığını və necə istifadə olunduğunu izah edir.
       </p>
       <h2>Hesab tələb olunmur</h2>

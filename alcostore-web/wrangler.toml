@@ -1,7 +1,0 @@
-#:schema node_modules/wrangler/config-schema.json
-# Cloudflare Pages (OpenNext çıxışı). Layihə adı deploy əmrində verilir:
-#   alcostore-web (prod, alcostore.az) / alcostore-web-dev (dev.alcostore.az)
-name = "alcostore-web"
-pages_build_output_dir = ".open-next/assets"
-compatibility_date = "2025-09-01"
-compatibility_flags = ["nodejs_compat"]

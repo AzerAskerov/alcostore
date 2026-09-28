@@ -27,3 +27,6 @@ asc-api-key*.p8
 
 # Local scratch
 .claude/worktrees/
+
+# Instagram xam yükləmə (emal olunmuş şəkillər api/seed-images/-dədir)
+assets-src/instagram/

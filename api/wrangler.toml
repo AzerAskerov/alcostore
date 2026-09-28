@@ -3,6 +3,8 @@ name = "alcostore-api"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+# alcostorebaku.az zonası bu Cloudflare hesabına keçəndən sonra açılacaq (docs/INFRA.md):
+# routes = [{ pattern = "api.alcostorebaku.az", custom_domain = true }]
 
 [observability.logs]
 enabled = true
@@ -10,13 +12,13 @@ head_sampling_rate = 1
 invocation_logs = true
 
 # ===========================================
-# PRODUCTION (default) — api.alcostore.az
+# PRODUCTION (default) — api.alcostorebaku.az
 # ===========================================
 
 [[d1_databases]]
 binding = "DB"
 database_name = "alcostoreDb"
-database_id = "REPLACE_WITH_PROD_D1_ID"
+database_id = "669c5093-63f1-460d-aa0f-ec26694757a5"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
@@ -25,10 +27,10 @@ bucket_name = "alcostore-imgs"
 
 [vars]
 ENVIRONMENT = "production"
-API_BASE_URL = "https://api.alcostore.az"
-FRONTEND_URL = "https://alcostore.az"
-R2_PUBLIC_URL = "https://api.alcostore.az/media"
-CORS_ORIGINS = "https://alcostore.az,https://www.alcostore.az"
+API_BASE_URL = "https://alcostore-api.sigortamat90.workers.dev"
+FRONTEND_URL = "https://alcostore-web.sigortamat90.workers.dev"
+R2_PUBLIC_URL = "https://alcostore-api.sigortamat90.workers.dev/media"
+CORS_ORIGINS = "https://alcostore-web.sigortamat90.workers.dev,https://alcostorebaku.az,https://www.alcostorebaku.az"
 
 # Secrets (wrangler secret put <NAME>):
 #   JWT_SECRET            — admin JWT imzası
@@ -58,22 +60,23 @@ ENVIRONMENT = "local"
 API_BASE_URL = "http://localhost:8787"
 FRONTEND_URL = "http://localhost:3000"
 R2_PUBLIC_URL = "http://localhost:8787/media"
-CORS_ORIGINS = "http://localhost:3000,http://localhost:8081"
+CORS_ORIGINS = "http://localhost:3000,http://localhost:8081,https://local.alcostorebaku.az"
 JWT_SECRET = "local-dev-secret-DO-NOT-USE-IN-PRODUCTION"
 # Yalnız local: Telegram-sız admin girişi (POST /admin/auth/dev). Dev/prod-da YOXDUR.
 DEV_LOGIN_ENABLED = "1"
 ADMIN_TELEGRAM_IDS = "0"
 
 # ===========================================
-# CLOUD DEV (wrangler deploy --env dev) — dev-api.alcostore.az
+# CLOUD DEV (wrangler deploy --env dev) — dev-api.alcostorebaku.az
 # ===========================================
 [env.dev]
 name = "alcostore-api-dev"
+# routes = [{ pattern = "dev-api.alcostorebaku.az", custom_domain = true }]
 
 [[env.dev.d1_databases]]
 binding = "DB"
 database_name = "alcostoreDb-dev"
-database_id = "REPLACE_WITH_DEV_D1_ID"
+database_id = "bbfaf3e2-e897-4143-a109-001e2ba3ab18"
 migrations_dir = "migrations"
 
 [[env.dev.r2_buckets]]
@@ -82,7 +85,7 @@ bucket_name = "alcostore-imgs-dev"
 
 [env.dev.vars]
 ENVIRONMENT = "development"
-API_BASE_URL = "https://dev-api.alcostore.az"
-FRONTEND_URL = "https://dev.alcostore.az"
-R2_PUBLIC_URL = "https://dev-api.alcostore.az/media"
-CORS_ORIGINS = "https://dev.alcostore.az"
+API_BASE_URL = "https://alcostore-api-dev.sigortamat90.workers.dev"
+FRONTEND_URL = "https://alcostore-web-dev.sigortamat90.workers.dev"
+R2_PUBLIC_URL = "https://alcostore-api-dev.sigortamat90.workers.dev/media"
+CORS_ORIGINS = "https://alcostore-web-dev.sigortamat90.workers.dev,https://dev.alcostorebaku.az"

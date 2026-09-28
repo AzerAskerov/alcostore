@@ -21,7 +21,7 @@ publicRoutes.get('/home', async (c) => {
   const base = c.env.R2_PUBLIC_URL
   const [settings, categories, banners, popular] = await Promise.all([
     getSettings(c.env.DB),
-    listCategories(c.env.DB),
+    listCategories(c.env.DB, base),
     listBanners(c.env.DB, base),
     listProducts(c.env.DB, base, { featured: true, page_size: 12 }),
   ])
@@ -36,7 +36,7 @@ publicRoutes.get('/settings', async (c) => {
 
 publicRoutes.get('/categories', async (c) => {
   cache(c)
-  return c.json(await listCategories(c.env.DB))
+  return c.json(await listCategories(c.env.DB, c.env.R2_PUBLIC_URL))
 })
 
 publicRoutes.get('/banners', async (c) => {

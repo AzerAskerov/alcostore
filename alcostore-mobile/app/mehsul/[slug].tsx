@@ -93,7 +93,7 @@ function ProductView({ product, whatsapp, storeName }: { product: Product; whats
       />
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={[s.hero, { paddingTop: insets.top + 44 }]}>
-          <ProductImage url={product.images[0]?.url} category={product.category_slug} style={{ flex: 1, width: '100%' }} />
+          <ProductImage url={product.images[0]?.url} category={product.category_slug} style={{ flex: 1, width: '100%' }} fit="contain" />
           <View style={s.age}>
             <T variant="mono" style={{ fontSize: 10, color: colors.text3 }}>18+</T>
           </View>

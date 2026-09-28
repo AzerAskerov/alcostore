@@ -1,0 +1,269 @@
+name: Release Mobile to Stores
+
+# TurMat/.github/workflows/release-mobile-store.yml-dən uyğunlaşdırılıb.
+# 1) versiya bump  2) EAS production build  3) store submit (+ iOS App Review)  4) git tag + GitHub Release
+#
+# AlcoStore fərqləri:
+#   - ios_release: MANUAL (defolt) → Apple təsdiqləyəndən sonra "Pending Developer Release"-də gözləyir;
+#                  real data hazır olanda App Store Connect-dən "Release" basılır.
+#   - android_track: internal | alpha (closed) | production. Yeni personal Play hesabı üçün əvvəlcə
+#                  closed test (12 tester × 14 gün) lazımdır — docs/RELEASE.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_release:
+        description: 'Tam store release üçün "release" yazın'
+        required: true
+        type: string
+      platform:
+        description: 'Hansı platform build+submit olunsun'
+        required: true
+        type: choice
+        options: [all, ios, android]
+        default: all
+      version:
+        description: 'Optional exact version (boş olsa avtomatik +1 son seqment)'
+        required: false
+        type: string
+        default: ''
+      release_notes:
+        description: 'Release notes (iOS What''s New + GitHub Release)'
+        required: true
+        type: string
+      ios_release:
+        description: 'iOS təsdiqdən sonra: MANUAL (əl ilə açılır) və ya AFTER_APPROVAL (avtomatik)'
+        required: true
+        type: choice
+        options: [MANUAL, AFTER_APPROVAL]
+        default: MANUAL
+      android_track:
+        description: 'Google Play track'
+        required: true
+        type: choice
+        options: [internal, alpha, production]
+        default: internal
+
+jobs:
+  release:
+    name: Bump, Build, Submit, Release
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_release == 'release'
+    environment: production-mobile
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: alcostore-mobile
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      CI: 1
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate branch
+        working-directory: .
+        run: |
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            echo "❌ Bu workflow yalnız main branch-dən işlədilməlidir."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        working-directory: .
+        run: npm ci --ignore-scripts
+
+      - name: Validate release notes
+        working-directory: .
+        env:
+          RELEASE_NOTES: ${{ github.event.inputs.release_notes }}
+        run: |
+          if [ -z "$(echo "$RELEASE_NOTES" | tr -d '[:space:]')" ]; then
+            echo "❌ release_notes boş ola bilməz."
+            exit 1
+          fi
+
+      - name: Bump mobile version
+        id: bump
+        env:
+          VERSION_OVERRIDE: ${{ github.event.inputs.version }}
+        run: node scripts/bumpMobileVersion.mjs
+
+      - name: Commit and push version bump
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add alcostore-mobile/app.config.js alcostore-mobile/package.json
+          git commit -m "chore(mobile): bump app version to ${{ steps.bump.outputs.version }} [skip ci]"
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: EAS production build
+        id: eas_build
+        env:
+          SUBMIT_PLATFORM: ${{ github.event.inputs.platform }}
+          APP_VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          node <<'NODE'
+          const { execSync } = require('node:child_process')
+          const fs = require('node:fs')
+          const platform = process.env.SUBMIT_PLATFORM || 'all'
+          console.log(`🏗️ EAS build: profile=production platform=${platform} version=${process.env.APP_VERSION}`)
+          const raw = execSync(`eas build --profile production --platform ${platform} --non-interactive --wait --json`, {
+            encoding: 'utf8',
+            maxBuffer: 32 * 1024 * 1024,
+          })
+          let builds
+          try {
+            builds = JSON.parse(raw)
+          } catch {
+            const idx = Math.max(raw.lastIndexOf('['), raw.lastIndexOf('{'))
+            if (idx < 0) {
+              console.error('❌ EAS build JSON parse failed')
+              console.error(raw.slice(-4000))
+              process.exit(1)
+            }
+            builds = JSON.parse(raw.slice(idx))
+          }
+          const list = Array.isArray(builds) ? builds : [builds]
+          const ios = list.find((b) => b.platform === 'IOS')
+          const android = list.find((b) => b.platform === 'ANDROID')
+          const needIos = platform === 'all' || platform === 'ios'
+          const needAndroid = platform === 'all' || platform === 'android'
+          if (needIos && (!ios || ios.status !== 'FINISHED')) {
+            console.error('❌ iOS production build FAILED/missing', ios?.status, ios?.id)
+            process.exit(1)
+          }
+          if (needAndroid && (!android || android.status !== 'FINISHED')) {
+            console.error('❌ Android production build FAILED/missing', android?.status, android?.id)
+            process.exit(1)
+          }
+          const version = (ios || android).appVersion
+          if (version !== process.env.APP_VERSION) {
+            console.error(`Build appVersion (${version}) does not match bump (${process.env.APP_VERSION}).`)
+            process.exit(1)
+          }
+          const base = 'https://expo.dev/accounts/azeraskerov/projects/alcostore/builds'
+          const output = {
+            version,
+            ios_id: ios?.id || '',
+            android_id: android?.id || '',
+            ios_url: ios ? `${base}/${ios.id}` : '',
+            android_url: android ? `${base}/${android.id}` : '',
+            ios_build_number: ios?.appBuildVersion || '',
+            android_version_code: android?.appBuildVersion || '',
+          }
+          console.log(JSON.stringify(output, null, 2))
+          for (const [k, v] of Object.entries(output)) fs.appendFileSync(process.env.GITHUB_OUTPUT, `${k}=${v}\n`)
+          NODE
+
+      - name: Prepare store credentials
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          EXPO_ASC_API_KEY_P8: ${{ secrets.EXPO_ASC_API_KEY_P8 }}
+          EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
+          EXPO_ASC_API_KEY_ISSUER_ID: ${{ secrets.EXPO_ASC_API_KEY_ISSUER_ID }}
+          ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+          ANDROID_TRACK: ${{ github.event.inputs.android_track }}
+          SUBMIT_PLATFORM: ${{ github.event.inputs.platform }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const platform = process.env.SUBMIT_PLATFORM || 'all'
+          const needAndroid = platform === 'all' || platform === 'android'
+          const needIos = platform === 'all' || platform === 'ios'
+          const missing = []
+          if (needAndroid && !process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON) missing.push('GOOGLE_PLAY_SERVICE_ACCOUNT_JSON')
+          if (needIos) {
+            for (const k of ['EXPO_ASC_API_KEY_P8', 'EXPO_ASC_API_KEY_ID', 'EXPO_ASC_API_KEY_ISSUER_ID']) if (!process.env[k]) missing.push(k)
+            if (!process.env.ASC_APP_ID) missing.push('vars.ASC_APP_ID (App Store Connect-də yaradılmış app ID)')
+          }
+          if (missing.length) {
+            console.error('❌ Çatışmayan GitHub secrets/vars:', missing.join(', '))
+            process.exit(1)
+          }
+          const eas = JSON.parse(fs.readFileSync('eas.json', 'utf8'))
+          if (needAndroid) {
+            fs.writeFileSync('google-play-key.json', process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON)
+            const track = process.env.ANDROID_TRACK || 'internal'
+            eas.submit.production.android.track = track
+            // internal/closed: "completed" dərhal testerlərə çatır; production: draft → Play Console-da əl ilə rollout
+            eas.submit.production.android.releaseStatus = track === 'production' ? 'draft' : 'completed'
+            console.log(`✅ Android: track=${track}`)
+          }
+          if (needIos) {
+            fs.writeFileSync('AuthKey.p8', process.env.EXPO_ASC_API_KEY_P8)
+            Object.assign(eas.submit.production.ios, {
+              ascAppId: process.env.ASC_APP_ID,
+              ascApiKeyPath: './AuthKey.p8',
+              ascApiKeyId: process.env.EXPO_ASC_API_KEY_ID,
+              ascApiKeyIssuerId: process.env.EXPO_ASC_API_KEY_ISSUER_ID,
+            })
+            console.log('✅ iOS App Store Connect API key yazıldı')
+          }
+          fs.writeFileSync('eas.json', `${JSON.stringify(eas, null, 2)}\n`)
+          NODE
+
+      - name: Submit iOS to App Store Connect
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
+        run: eas submit --profile production --platform ios --id ${{ steps.eas_build.outputs.ios_id }} --non-interactive --wait
+
+      - name: Submit iOS for App Review
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
+        env:
+          ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+          ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.EXPO_ASC_API_KEY_ISSUER_ID }}
+          ASC_API_KEY_PATH: ./AuthKey.p8
+          APP_VERSION: ${{ steps.eas_build.outputs.version }}
+          BUILD_NUMBER: ${{ steps.eas_build.outputs.ios_build_number }}
+          WHATS_NEW: ${{ github.event.inputs.release_notes }}
+          REQUIRE_WHATS_NEW: '1'
+          RELEASE_TYPE: ${{ github.event.inputs.ios_release }}
+        run: node scripts/ascSubmitForReview.mjs
+
+      - name: Submit Android to Play Store
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'android'
+        run: eas submit --profile production --platform android --id ${{ steps.eas_build.outputs.android_id }} --non-interactive --wait
+
+      - name: Create git tag and GitHub Release
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NOTES: ${{ github.event.inputs.release_notes }}
+        run: |
+          TAG="mobile-v${{ steps.eas_build.outputs.version }}"
+          SHA=$(git rev-parse HEAD)
+          NOTES=$(cat <<EOF
+          ## Alco Store Mobile v${{ steps.eas_build.outputs.version }}
+
+          ${RELEASE_NOTES}
+
+          ---
+          - **iOS:** ${{ steps.eas_build.outputs.ios_url }} — build ${{ steps.eas_build.outputs.ios_build_number }} (release: ${{ github.event.inputs.ios_release }})
+          - **Android:** ${{ steps.eas_build.outputs.android_url }} — versionCode ${{ steps.eas_build.outputs.android_version_code }} (track: ${{ github.event.inputs.android_track }})
+          - **Commit:** ${SHA}
+          EOF
+          )
+          git rev-parse "$TAG" >/dev/null 2>&1 || { git tag "$TAG" "$SHA"; git push origin "$TAG"; }
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "Alco Store Mobile v${{ steps.eas_build.outputs.version }}" --notes "$NOTES"
+
+      - name: Cleanup store credential files
+        if: always()
+        run: rm -f google-play-key.json AuthKey.p8

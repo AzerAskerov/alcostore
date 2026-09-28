@@ -12,7 +12,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   free_delivery_min: 50,
   delivery_fee: 5,
   min_order: 15,
-  support_email: 'info@alcostore.az',
+  support_email: 'info@alcostorebaku.az',
   address: 'Bakı, Azərbaycan',
   instagram: 'https://www.instagram.com/alcostore.baku/',
 }

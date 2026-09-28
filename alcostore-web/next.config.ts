@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       {
         // Dev host heç vaxt indekslənməməlidir.
         source: '/:path*',
-        has: [{ type: 'host', value: 'dev.alcostore.az' }],
+        has: [{ type: 'host', value: 'dev.alcostorebaku.az' }],
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {

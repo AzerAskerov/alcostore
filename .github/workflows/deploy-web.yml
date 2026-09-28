@@ -1,0 +1,119 @@
+name: Deploy Web + API to Cloudflare
+
+# TurMat/.github/workflows/deploy-web.yml əsasında:
+#   development → dev   ·  main → production
+# Sıra: API bundle dry-run → D1 migrations → API Worker deploy → web (OpenNext) build → web Worker deploy → smoke test.
+# Web build API deploy-dan SONRA gedir ki, web xətası API düzəlişlərini saxlamasın (TurMat dərsi).
+#
+# URL-lər repo dəyişənlərindən gəlir (Settings → Variables). alcostorebaku.az hazır olana qədər
+# defolt workers.dev ünvanlarıdır; domen qoşulanda yalnız dəyişənlər yenilənir:
+#   DEV_API_URL, DEV_WEB_URL, PROD_API_URL, PROD_WEB_URL
+
+on:
+  push:
+    branches: [development, main]
+    paths:
+      - 'alcostore-web/**'
+      - 'api/**'
+      - 'packages/shared/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-web-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: 'false'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "env_flag=" >> $GITHUB_OUTPUT
+            echo "api_url=${{ vars.PROD_API_URL || 'https://alcostore-api.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcostore-web.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_PROD }}" >> $GITHUB_OUTPUT
+            echo "migrate=migrate:prod" >> $GITHUB_OUTPUT
+          else
+            echo "environment=development" >> $GITHUB_OUTPUT
+            echo "env_flag=--env dev" >> $GITHUB_OUTPUT
+            echo "api_url=${{ vars.DEV_API_URL || 'https://alcostore-api-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "web_url=${{ vars.DEV_WEB_URL || 'https://alcostore-web-dev.sigortamat90.workers.dev' }}" >> $GITHUB_OUTPUT
+            echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_DEV }}" >> $GITHUB_OUTPUT
+            echo "migrate=migrate:dev" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      # Lockfile-dan deterministik install (TurMat 2026-07-23 dərsi)
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      # wrangler deploy API-nin YEGANƏ build addımıdır — sınıq import-u prod-dan əvvəl tutmaq üçün
+      - name: Verify API bundle (dry-run)
+        working-directory: api
+        run: npx wrangler deploy ${{ steps.env.outputs.env_flag }} --dry-run --outdir=.wrangler/dry-run
+
+      - name: Run D1 migrations
+        working-directory: api
+        run: npm run ${{ steps.env.outputs.migrate }}
+
+      - name: Deploy API Worker
+        working-directory: api
+        run: |
+          npx wrangler deploy ${{ steps.env.outputs.env_flag }} \
+            --var API_BASE_URL:${{ steps.env.outputs.api_url }} \
+            --var R2_PUBLIC_URL:${{ steps.env.outputs.api_url }}/media \
+            --var FRONTEND_URL:${{ steps.env.outputs.web_url }} \
+            --var CORS_ORIGINS:${{ steps.env.outputs.web_url }}
+
+      - name: Build web (OpenNext)
+        working-directory: alcostore-web
+        env:
+          NEXT_PUBLIC_API_URL: ${{ steps.env.outputs.api_url }}
+          NEXT_PUBLIC_ENV: ${{ steps.env.outputs.environment }}
+          NEXT_PUBLIC_BASE_URL: ${{ steps.env.outputs.web_url }}
+          NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${{ steps.env.outputs.telegram_bot }}
+          NEXT_PUBLIC_APP_STORE_URL: ${{ vars.APP_STORE_URL }}
+          NEXT_PUBLIC_PLAY_STORE_URL: ${{ vars.PLAY_STORE_URL }}
+        run: npx opennextjs-cloudflare build
+
+      - name: Deploy web Worker
+        working-directory: alcostore-web
+        run: npx opennextjs-cloudflare deploy ${{ steps.env.outputs.env_flag }}
+
+      # TurMat-dakı "boş səhifə deploy olunmasın" qapısının sadə forması
+      - name: Smoke test
+        run: |
+          set -e
+          api=$(curl -s -o /dev/null -w '%{http_code}' ${{ steps.env.outputs.api_url }}/health)
+          echo "API /health → $api"; test "$api" = "200"
+          curl -s ${{ steps.env.outputs.web_url }}/ -o home.html
+          n=$(grep -o '/mehsul/[a-z0-9-]*' home.html | sort -u | wc -l)
+          echo "Web / → $(wc -c < home.html) bytes, $n məhsul linki"
+          test "$n" -ge 3
+
+      - name: Summary
+        run: |
+          echo "### 🚀 ${{ steps.env.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Web: ${{ steps.env.outputs.web_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API: ${{ steps.env.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

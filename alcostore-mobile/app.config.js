@@ -19,8 +19,13 @@ const IS_DEV = ENV === 'development'
 // EAS layihəsi: @azeraskerov/alcostore
 const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID || '100319b1-a3a2-46cd-9d72-ec96408f968e'
 
+// alcostorebaku.az hazır olana qədər workers.dev (eas.json env-i üstünlük təşkil edir)
 const API_URL =
-  process.env.EXPO_PUBLIC_API_URL || (IS_DEV ? 'https://dev-api.alcostore.az' : 'https://api.alcostore.az')
+  process.env.EXPO_PUBLIC_API_URL ||
+  (IS_DEV ? 'https://alcostore-api-dev.sigortamat90.workers.dev' : 'https://alcostore-api.sigortamat90.workers.dev')
+const WEB_URL =
+  process.env.EXPO_PUBLIC_WEB_URL ||
+  (IS_DEV ? 'https://alcostore-web-dev.sigortamat90.workers.dev' : 'https://alcostore-web.sigortamat90.workers.dev')
 
 const fs = require('fs')
 const path = require('path')
@@ -41,11 +46,11 @@ const config = {
   ios: {
     bundleIdentifier: IS_DEV ? 'app.alcostore.ios.dev' : 'app.alcostore.ios',
     supportsTablet: false,
-    associatedDomains: IS_DEV ? ['applinks:dev.alcostore.az'] : ['applinks:alcostore.az', 'applinks:www.alcostore.az'],
+    associatedDomains: IS_DEV ? ['applinks:dev.alcostorebaku.az'] : ['applinks:alcostorebaku.az', 'applinks:www.alcostorebaku.az'],
     ...(has('GoogleService-Info.plist') ? { googleServicesFile: './GoogleService-Info.plist' } : {}),
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-      NSUserSupportURL: 'https://alcostore.az/support',
+      NSUserSupportURL: 'https://alcostorebaku.az/support',
       // WhatsApp-ın quraşdırılıb-quraşdırılmadığını yoxlamaq üçün
       LSApplicationQueriesSchemes: ['whatsapp'],
     },
@@ -64,7 +69,7 @@ const config = {
       {
         action: 'VIEW',
         autoVerify: true,
-        data: (IS_DEV ? ['dev.alcostore.az'] : ['alcostore.az', 'www.alcostore.az']).flatMap((host) => [
+        data: (IS_DEV ? ['dev.alcostorebaku.az'] : ['alcostorebaku.az', 'www.alcostorebaku.az']).flatMap((host) => [
           { scheme: 'https', host, pathPrefix: '/mehsul' },
           { scheme: 'https', host, pathPrefix: '/kateqoriya' },
         ]),
@@ -92,6 +97,7 @@ const config = {
   extra: {
     ...(EAS_PROJECT_ID ? { eas: { projectId: EAS_PROJECT_ID } } : {}),
     apiUrl: API_URL,
+    webUrl: WEB_URL,
     env: ENV,
   },
   runtimeVersion: { policy: 'appVersion' },

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { isStoreOpen, whatsappUrl } from '@alcostore/shared'
-import { BottleArt } from '@/components/BottleArt'
 import { ProductCard } from '@/components/ProductCard'
+import { ProductImage } from '@/components/ProductImage'
 import { api } from '@/lib/api'
 
 export default async function HomePage() {
@@ -22,8 +22,8 @@ export default async function HomePage() {
             Kataloqdan seç, sifarişi <em className="text-gold">WhatsApp</em>-da tamamla
           </h1>
           <p className="mt-5 max-w-xl text-text3">
-            {total}-dən çox şərab, viski, konyak və pivə. Qiymətlər saytda açıq göstərilir, sifariş bir düymə ilə
-            WhatsApp-a keçir.
+            {total} məhsul: {categories.map((c) => c.name_az.toLowerCase()).join(', ')}. Qiymətlər saytda açıq
+            göstərilir, sifariş bir düymə ilə WhatsApp-a keçir.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="#kataloq" className="glow-red inline-flex h-14 items-center rounded-[14px] bg-red px-7 font-semibold text-on-red">
@@ -45,13 +45,13 @@ export default async function HomePage() {
             </span>
           </div>
         </div>
-        <div className="relative hidden h-[420px] overflow-hidden rounded-[18px] border border-line bg-gradient-to-b from-[#2A201A] to-[#14100E] md:block">
-          <div className="absolute inset-x-0 bottom-0 flex items-end justify-center gap-2 px-8 pb-6">
-            {['serab', 'viski', 'konyak', 'sampan', 'araq'].map((c, i) => (
-              <BottleArt key={c} category={c} className={`w-[18%] ${i % 2 ? 'h-[280px]' : 'h-[330px]'}`} />
-            ))}
+        <div className="relative h-[260px] overflow-hidden rounded-[18px] border border-line md:h-[420px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/store-front.jpg" alt={`${settings.store_name} mağazası — ${settings.address}`} className="h-full w-full object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
+            <div className="kicker text-gold">Mağaza</div>
+            <div className="text-sm text-text2">{settings.address}</div>
           </div>
-          <div className="absolute inset-x-8 bottom-6 h-px bg-gold/40" />
         </div>
       </section>
 
@@ -59,10 +59,16 @@ export default async function HomePage() {
       {banners.length ? (
         <section className="grid gap-4 md:grid-cols-2">
           {banners.map((b) => (
-            <Link key={b.id} href={b.link || '#kataloq'} className="promo block rounded-[16px] p-6 transition hover:brightness-110">
-              {b.kicker ? <div className="kicker text-red">{b.kicker}</div> : null}
-              <div className="mt-2 font-serif text-3xl">{b.title}</div>
-              {b.subtitle ? <div className="mt-1 text-sm text-text3">{b.subtitle}</div> : null}
+            <Link key={b.id} href={b.link || '#kataloq'} className="promo relative flex min-h-[180px] overflow-hidden rounded-[16px] transition hover:brightness-110">
+              {b.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={b.image_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" />
+              ) : null}
+              <div className="relative mt-auto w-full bg-gradient-to-t from-black/85 to-transparent p-6">
+                {b.kicker ? <div className="kicker text-red">{b.kicker}</div> : null}
+                <div className="mt-2 font-serif text-3xl">{b.title}</div>
+                {b.subtitle ? <div className="mt-1 text-sm text-text3">{b.subtitle}</div> : null}
+              </div>
             </Link>
           ))}
         </section>
@@ -93,10 +99,14 @@ export default async function HomePage() {
         <h2 className="font-serif text-4xl">Kateqoriyalar</h2>
         <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           {categories.map((c) => (
-            <Link key={c.id} href={`/kateqoriya/${c.slug}`} className="group flex flex-col items-center rounded-[16px] border border-line bg-surface p-4 hover:border-gold/50">
-              <BottleArt category={c.slug} className="h-32 w-20" />
-              <div className="mt-2 font-medium group-hover:text-gold">{c.name_az}</div>
-              <div className="font-mono text-xs text-muted">{c.product_count} məhsul</div>
+            <Link key={c.id} href={`/kateqoriya/${c.slug}`} className="group overflow-hidden rounded-[16px] border border-line bg-surface hover:border-gold/50">
+              <div className="aspect-[4/5] overflow-hidden bg-surface2">
+                <ProductImage url={c.image_url} category={c.slug} name={c.name_az} className="transition duration-300 group-hover:scale-[1.04]" />
+              </div>
+              <div className="p-3">
+                <div className="font-medium group-hover:text-gold">{c.name_az}</div>
+                <div className="font-mono text-xs text-muted">{c.product_count} məhsul</div>
+              </div>
             </Link>
           ))}
         </div>

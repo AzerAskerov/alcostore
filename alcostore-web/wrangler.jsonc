@@ -1,0 +1,20 @@
+// Next.js (OpenNext) → Cloudflare Workers.
+// TurMat Cloudflare Pages istifadə edir; 2026-da yeni Pages layihələri artıq Workers kimi yaradılır,
+// ona görə burada OpenNext-in rəsmi Workers axını var: `opennextjs-cloudflare build && ... deploy`.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "alcostore-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  // alcostorebaku.az zonası bu hesaba keçəndən sonra:
+  // "routes": [{ "pattern": "alcostorebaku.az", "custom_domain": true }, { "pattern": "www.alcostorebaku.az", "custom_domain": true }],
+  "env": {
+    "dev": {
+      "name": "alcostore-web-dev"
+      // "routes": [{ "pattern": "dev.alcostorebaku.az", "custom_domain": true }]
+    }
+  }
+}

@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "build:pages": "npm run build && opennextjs-cloudflare build --skipNextBuild",
-    "prepare:pages": "node scripts/prepare-pages.mjs",
-    "deploy:dev": "npm run build:pages && npm run prepare:pages && wrangler pages deploy .open-next/assets --project-name=alcostore-web-dev",
-    "deploy:prod": "npm run build:pages && npm run prepare:pages && wrangler pages deploy .open-next/assets --project-name=alcostore-web"
+    "deploy:dev": "opennextjs-cloudflare build && opennextjs-cloudflare deploy --env dev",
+    "deploy:prod": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview"
   },
   "dependencies": {
     "@alcostore/shared": "*",

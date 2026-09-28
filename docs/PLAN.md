@@ -75,8 +75,8 @@ AlcoStore/  (monorepo, npm workspaces)
 
 ```
 [Mobil app] ─┐
-             ├──HTTPS──► [api.alcostore.az : Worker/Hono] ──► D1 (məhsullar, sifarişlər, cihazlar)
-[Veb sayt]  ─┘                    │                        └► R2 → cdn.alcostore.az (foto)
+             ├──HTTPS──► [api.alcostorebaku.az : Worker/Hono] ──► D1 (məhsullar, sifarişlər, cihazlar)
+[Veb sayt]  ─┘                    │                        └► R2 → cdn.alcostorebaku.az (foto)
                                   ├──► Expo Push API ──► FCM / APNs
 [Admin /admin] ──Telegram login──►│
                                   └──► Telegram Bot → admin-lərə "yeni sifariş" bildirişi
@@ -107,8 +107,8 @@ TurMat-dan fərqli və ya əlavə olaraq təklif etdiklərim:
 | Veb | Next.js 16, Tailwind v4, shadcn/ui, OpenNext → Cloudflare Pages | eyni |
 | API | Cloudflare Workers + Hono, JWT, raw SQL | eyni |
 | DB | Cloudflare D1: `alcostoreDb`, `alcostoreDb-dev`, `alcostoreDb-local` | eyni |
-| Fayllar | R2: `alcostore-imgs`, `alcostore-imgs-dev` → `cdn.alcostore.az` | eyni |
-| Local dev | Cloudflare Tunnel (`local-api.alcostore.az` və s.), `start-local.ps1` | eyni |
+| Fayllar | R2: `alcostore-imgs`, `alcostore-imgs-dev` → `cdn.alcostorebaku.az` | eyni |
+| Local dev | Cloudflare Tunnel (`local-api.alcostorebaku.az` və s.), `start-local.ps1` | eyni |
 | Paket meneceri | npm workspaces, Node 22, `.nvmrc` əlavə edəcəyik (TurMat-da yoxdur) | npm |
 | Commit | Husky + Conventional Commits | eyni |
 
@@ -152,7 +152,7 @@ Seed yalnız dev və ilk prod üçündür. Real data gələndə admin paneldən 
 6. Səbət: stepper, cəm, WhatsApp mətninin önizləməsi → `wa.me` linki + `POST /orders`.
 7. Sevimlilər (lokal).
 8. Profil/Ayarlar: bildirişlər, dil (hazırlıq), əlaqə (WhatsApp, zəng), məxfilik, şərtlər, versiya.
-9. Deep link: `alcostore://product/<slug>` və `https://alcostore.az/p/<slug>` (push kliki buraya aparır).
+9. Deep link: `alcostore://product/<slug>` və `https://alcostorebaku.az/p/<slug>` (push kliki buraya aparır).
 10. OTA update (EAS Update).
 
 **Hesab / login yoxdur.** Müştəri TurMat-dakı kimi anonim `device_id` ilə işləyir. Bunun üstünlükləri:
@@ -160,13 +160,13 @@ Seed yalnız dev və ilk prod üçündür. Real data gələndə admin paneldən 
 - 4.8 "Sign in with Apple" tələbi düşmür;
 - review daha sürətli keçir.
 
-**Veb (alcostore.az)**
+**Veb (alcostorebaku.az)**
 - Dizayndakı desktop ekranı, eyni kataloq, məhsul səhifələri (SEO, ISR), səbət → WhatsApp.
 - Yaş təsdiqi modalı.
 - Store üçün vacib səhifələr: `/privacy`, `/terms`, `/support`, `/data-deletion`.
 - Mobilə yönləndirmə: "App Store / Google Play" düymələri (app çıxandan sonra).
 
-**Admin (`alcostore.az/admin`)**
+**Admin (`alcostorebaku.az/admin`)**
 - Telegram Login Widget → API hash-i yoxlayır → `ADMIN_TELEGRAM_IDS` whitelist-ə baxır → JWT verir. Bu, TurMat-dakı eyni axındır.
 - Məhsullar: CRUD, variantlar, foto yükləmə (R2), aktiv/deaktiv, "populyar".
 - Kateqoriyalar, bannerlər, mağaza ayarları (WhatsApp nömrəsi, iş saatları, çatdırılma mətni).
@@ -190,7 +190,7 @@ Seed yalnız dev və ilk prod üçündür. Real data gələndə admin paneldən 
 | **Google Play Console** | yeni app, package `app.alcostore.android` (dev: `.dev`) | ⚠️ 12 tester qaydası (§7.4). Service account JSON (TurMat kimi) |
 | **Firebase** | yeni layihə `alcostore` → `google-services.json`, `GoogleService-Info.plist`, FCM V1 service account → EAS | — |
 | **Cloudflare** | eyni hesab: Workers (`alcostore-api`, `alcostore-api-dev`), Pages (`alcostore-web`, `alcostore-web-dev`), D1, R2, DNS, Tunnel | domen Cloudflare DNS-ə keçməlidir |
-| **Domen** | `alcostore.az` (dizayndakı) → `api.`, `dev.`, `dev-api.`, `cdn.`, `cdn-dev.`, `local-*` | ❓ alınıb? |
+| **Domen** | `alcostorebaku.az` (dizayndakı) → `api.`, `dev.`, `dev-api.`, `cdn.`, `cdn-dev.`, `local-*` | ❓ alınıb? |
 | **Telegram** | yeni botlar: `@alcostore_bot` (prod), `@alcostore_dev_bot`, `@alcostore_local_bot` + BotFather `/setdomain` | admin login + bildirişlər |
 | **WhatsApp** | mağazanın real nömrəsi (WhatsApp Business tövsiyə olunur) | ❓ nömrə |
 
@@ -220,7 +220,7 @@ Mock datanı **real mağaza datası kimi** hazırlasaq problem yoxdur. Rəyçi d
 - "Test", "Lorem ipsum", "Product 1" kimi mətnlər **olmamalıdır**;
 - **boş şüşə placeholder-ləri olmamalıdır**, real məhsul fotoları lazımdır. ❓ Fotoları kim təmin edəcək? Mağazanın öz çəkilişi ən təhlükəsizidir. Distribyutor/brend foto-ları adətən satış üçün icazəlidir, amma internetdən təsadüfi götürmək olmaz;
 - bütün düymələr işləməlidir: WhatsApp düyməsi **real, cavab verən nömrəyə** getməlidir. "+994 50 000 00 00" ilə göndərmək rədd səbəbidir;
-- məxfilik siyasəti və support URL-i canlı olmalıdır (`alcostore.az/privacy`, `/support`).
+- məxfilik siyasəti və support URL-i canlı olmalıdır (`alcostorebaku.az/privacy`, `/support`).
 
 Data API-dən gəldiyi üçün mock → real keçid **heç bir yeni review tələb etmir**.
 
@@ -308,9 +308,9 @@ TurMat-ı araşdırarkən bunlar göründü. AlcoStore-da təkrarlamırıq, TurM
 |---|---|---|
 | **0. Hazırlıq** (sənin tərəfin, paralel) | domen, WhatsApp nömrəsi, Apple org hesabı qərarı / D-U-N-S, Play hesab tipi, Telegram botları, loqo (1024 px), məhsul fotoları | hesablar hazır |
 | **1. Skelet** | monorepo, workspaces, shared paket, dizayn tokenləri, lint/TS, husky, CI | boş, amma deploy olunan layihə |
-| **2. API + DB** | D1 sxemi, migrations, mock seed, public endpoint-lər (kataloq, məhsul, banner, ayarlar), `/orders`, `/devices/register`, push servisi | `dev-api.alcostore.az` |
+| **2. API + DB** | D1 sxemi, migrations, mock seed, public endpoint-lər (kataloq, məhsul, banner, ayarlar), `/orders`, `/devices/register`, push servisi | `dev-api.alcostorebaku.az` |
 | **3. Mobil MVP** | §5-dəki ekranlar, age gate, push, deep link, səbət → WhatsApp | dev build (iOS + Android) |
-| **4. Veb + Admin** | vitrin, hüquqi səhifələr, Telegram login, CRUD, foto yükləmə, push göndərmə | `dev.alcostore.az`, `/admin` |
+| **4. Veb + Admin** | vitrin, hüquqi səhifələr, Telegram login, CRUD, foto yükləmə, push göndərmə | `dev.alcostorebaku.az`, `/admin` |
 | **5. Store hazırlığı** | ikon, splash, screenshot-lar, store mətnləri (az / en), privacy, IARC, Data safety, review notes | listing-lər hazır |
 | **6. Submit** | TestFlight + Play closed test → review → **manual/managed release** | təsdiqlənmiş, amma gizli |
 | **7. Real data** | admin-dən real kataloq → public release | canlı |
@@ -323,7 +323,7 @@ Mərhələ 1–4 kod tərəfidir və ardıcıl gedir. Mərhələ 0 dərhal başl
 
 1. **Hüquqi şəxs:** mağazanın MMC / VÖEN-i və alkoqol satış lisenziyası varmı? Apple-da Organization hesabı açaq, yoxsa mövcud Individual hesabınla gedək?
 2. **Google Play hesabı:** TurMat-ın Play hesabı personal-dır, yoxsa organization? Nə vaxt açılıb? (12 tester qaydası buna görə tətbiq olunur və ya olunmur.)
-3. **Domen:** `alcostore.az` alınıb? Mağazanın adı son olaraq "Alco Store"-dur?
+3. **Domen:** `alcostorebaku.az` alınıb? Mağazanın adı son olaraq "Alco Store"-dur?
 4. **Bundle ID-lər:** `app.alcostore.ios` / `app.alcostore.android` uyğundurmu? (Sonra dəyişmək olmur.)
 5. **WhatsApp nömrəsi** — review üçün real, cavab verən nömrə lazımdır.
 6. **Məhsul fotoları** — mağaza çəkəcək, yoxsa distribyutor verəcək?

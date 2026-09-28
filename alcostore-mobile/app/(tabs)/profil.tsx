@@ -51,6 +51,13 @@ export default function Profile() {
         <T variant="title" style={{ fontSize: 36, marginBottom: 16 }}>Profil</T>
 
         <Section title="Bildirişlər">
+          {perm === 'unsupported' ? (
+            <View style={s.item}>
+              <T variant="small" style={{ flex: 1, paddingVertical: 12 }}>
+                Bildirişlər Expo Go-da işləmir — dev və ya store build-də aktivdir.
+              </T>
+            </View>
+          ) : (
           <View style={s.item}>
             <T style={{ flex: 1 }}>Kampaniya və yeniliklər</T>
             <Switch
@@ -61,6 +68,7 @@ export default function Profile() {
               accessibilityLabel="Bildirişlər"
             />
           </View>
+          )}
         </Section>
 
         <Section title="Mənim">

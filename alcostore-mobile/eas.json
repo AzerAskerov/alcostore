@@ -16,7 +16,8 @@
       "ios": { "buildConfiguration": "Debug", "credentialsSource": "remote" },
       "env": {
         "EXPO_PUBLIC_ENV": "development",
-        "EXPO_PUBLIC_API_URL": "https://dev-api.alcostore.az"
+        "EXPO_PUBLIC_API_URL": "https://alcostore-api-dev.sigortamat90.workers.dev",
+        "EXPO_PUBLIC_WEB_URL": "https://alcostore-web-dev.sigortamat90.workers.dev"
       }
     },
     "preview": {
@@ -27,7 +28,8 @@
       "ios": { "credentialsSource": "remote" },
       "env": {
         "EXPO_PUBLIC_ENV": "development",
-        "EXPO_PUBLIC_API_URL": "https://dev-api.alcostore.az"
+        "EXPO_PUBLIC_API_URL": "https://alcostore-api-dev.sigortamat90.workers.dev",
+        "EXPO_PUBLIC_WEB_URL": "https://alcostore-web-dev.sigortamat90.workers.dev"
       }
     },
     "production": {
@@ -39,7 +41,8 @@
       "ios": { "buildConfiguration": "Release", "credentialsSource": "remote" },
       "env": {
         "EXPO_PUBLIC_ENV": "production",
-        "EXPO_PUBLIC_API_URL": "https://api.alcostore.az"
+        "EXPO_PUBLIC_API_URL": "https://alcostore-api.sigortamat90.workers.dev",
+        "EXPO_PUBLIC_WEB_URL": "https://alcostore-web.sigortamat90.workers.dev"
       }
     }
   },

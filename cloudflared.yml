@@ -1,0 +1,33 @@
+# Cloudflare Tunnel — Alco Store local development (TurMat/cloudflared.yml modeli)
+#
+# Bir dəfəlik setup: docs/LOCAL_DEV.md → "Tunnel setup"
+#   tunnel: alcostore-local (4a2cf252-ccf3-42f7-9af5-cb1b0c9e23ae)
+#   DNS: local-api / local / local-expo .alcostorebaku.az → CNAME <id>.cfargotunnel.com
+
+tunnel: 4a2cf252-ccf3-42f7-9af5-cb1b0c9e23ae
+credentials-file: C:\Users\asgaroff\.cloudflared\4a2cf252-ccf3-42f7-9af5-cb1b0c9e23ae.json
+
+ingress:
+  # API (wrangler dev)
+  - hostname: local-api.alcostorebaku.az
+    service: http://localhost:8787
+    originRequest:
+      connectTimeout: 30s
+
+  # Veb (next dev)
+  - hostname: local.alcostorebaku.az
+    service: http://localhost:3000
+    originRequest:
+      connectTimeout: 30s
+
+  # Expo Metro
+  - hostname: local-expo.alcostorebaku.az
+    service: http://localhost:8081
+    originRequest:
+      connectTimeout: 30s
+      httpHostHeader: localhost:8081
+
+  - service: http_status:404
+
+loglevel: info
+protocol: quic

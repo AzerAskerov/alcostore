@@ -98,7 +98,7 @@ adminRoutes.post('/uploads', async (c) => {
 // Categories
 // ---------------------------------------------------------------------------
 
-adminRoutes.get('/categories', async (c) => c.json(await listCategories(c.env.DB, true)))
+adminRoutes.get('/categories', async (c) => c.json(await listCategories(c.env.DB, c.env.R2_PUBLIC_URL, true)))
 
 adminRoutes.post('/categories', async (c) => {
   const b = await readJson(c.req)

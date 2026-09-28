@@ -8,6 +8,8 @@ export interface Category {
   sort: number
   is_active: boolean
   product_count?: number
+  /** Kateqoriyanın örtük şəkli — populyar aktiv məhsulun ilk fotosu */
+  image_url?: string | null
 }
 
 export interface ProductVariant {
