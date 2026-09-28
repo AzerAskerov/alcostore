@@ -13,7 +13,7 @@
 | Prod API / veb | ✅ https://alco.turmat.az/health → `{"ok":true,"env":"production"}`; https://alcoweb.turmat.az — `/privacy`, `/support`, `/data-deletion` 200 |
 | Hesablar | Apple Developer: TurMat-ın hesabı (Team `UVU22NWY28`, Individual). Expo `azeraskerov`, EAS projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`. Yeni hesab açılmır |
 | iOS konfiq | Bundle `app.alcostore.ios`, `supportsTablet: false`, deploymentTarget 16.4, `ITSAppUsesNonExemptEncryption: false`, `NSUserSupportURL` → `https://alcoweb.turmat.az/support` ✅ (Addım 0-da düzəldildi) |
-| associatedDomains | `applinks:alcostorebaku.az` (+www) — domen hələ yoxdur. Qərar: istifadəçi (Addım 0) |
+| associatedDomains | `applinks:alcostorebaku.az` (+www) — **saxlanılır** (qərar 2026-09-29). Domen alınanda veb-ə AASA qoyulur, yeni build lazım deyil |
 | Push (iOS) | `GoogleService-Info.plist` yoxdur (lazım deyil — Expo push APNs ilə birbaşa işləyir). APNs key — Addım 1 |
 | GitHub | Secrets: `EXPO_TOKEN` ✅; `EXPO_ASC_API_KEY_P8/_ID/_ISSUER_ID` ❌; variable `ASC_APP_ID` ❌ |
 | eas.json | `submit.production.ios.ascAppId` = `REPLACE_WITH_ASC_APP_ID` (Addım 2-də doldurulur) |
@@ -27,7 +27,7 @@
 
 ---
 
-## Addım 0 — Vəziyyəti yoxla + native düzəlişlər ✅ (2026-09-28, associatedDomains qərarı gözləyir)
+## Addım 0 — Vəziyyəti yoxla + native düzəlişlər ✅ (2026-09-29, associatedDomains saxlanılır)
 - Prod API/veb canlıdır (yuxarıdakı cədvəl).
 - `app.config.js`: `NSUserSupportURL` → `https://alcoweb.turmat.az/support` (native dəyişiklik, build-dən əvvəl).
 - `associatedDomains` `alcostorebaku.az`-a baxır — ya saxla (domen alınanda veb-də AASA faylı qoyulan kimi işə düşür, yeni build lazım deyil; o vaxta qədər zərərsizdir), ya da çıxar (sonra əlavə etmək yeni native build tələb edir).
