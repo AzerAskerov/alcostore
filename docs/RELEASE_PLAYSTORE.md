@@ -33,7 +33,7 @@ Dev resursları (`alcostore-api-dev`, `alcostore-web-dev`, `alcostoreDb-dev`, `a
 - Yoxla: `/`, `/privacy`, `/terms`, `/support`, `/data-deletion`, bir `/mehsul/...` səhifəsi.
 - ✅ İstifadəçi brauzerdə baxıb "ok" deyir.
 
-## Addım 2 — GitHub: push + prod-only workflow + secrets — qismən ✅ (push, prod-only workflow-lar, Cloudflare secrets, `production-mobile` env). Qalan: `EXPO_TOKEN`, `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
+## Addım 2 — GitHub: push + prod-only workflow + secrets ✅ (2026-09-28: 4 secret, `production-mobile` env; deploy-mobile hələ yalnız workflow_dispatch)
 - `development` → `main` (PR və ya birbaşa, istifadəçidən soruş). `main`-dəki köhnə `index.html` (GitHub Pages dizaynı) saxlanılır.
 - Workflow-ları prod-only et (`main`): `.github/workflows/deploy-web.yml`, `deploy-mobile.yml`, `release-mobile-store.yml`, `ci.yml`. URL defoltları: API `https://alco.turmat.az`, veb `https://alcoweb.turmat.az`.
 - Secrets (istifadəçi özü əlavə edir — dəyərləri GitHub-dan oxumaq olmur; TurMat reposundakı eyni dəyərlər):
@@ -43,7 +43,7 @@ Dev resursları (`alcostore-api-dev`, `alcostore-web-dev`, `alcostoreDb-dev`, `a
 - ⚠️ Repo PUBLIC-dir — secret-lər təhlükəsizdir, amma istifadəçiyə private etməyi təklif et (GitHub Pages dizayn linki itə bilər).
 - ✅ CI yaşıl, istifadəçi "ok".
 
-## Addım 3 — Expo/EAS prod konfiqurasiyası + Android credentials + FCM
+## Addım 3 — Expo/EAS prod konfiqurasiyası + Android credentials + FCM ✅ (2026-09-28: Firebase `alcostore-485c7`, google-services.json commit, EAS keystore + FCM V1 key)
 - `alcostore-mobile/eas.json` production env: `EXPO_PUBLIC_API_URL=https://alco.turmat.az`, `EXPO_PUBLIC_WEB_URL=https://alcoweb.turmat.az`.
 - Android keystore: EAS remote credentials (`eas credentials -p android` — ilk dəfə interaktivdir, istifadəçi ilə birlikdə).
 - Push (FCM): Firebase layihəsi → `google-services.json` (package `app.alcostore.android`) + FCM V1 service account açarını EAS-a yüklə. Bax: `TurMat/docs/FCM_SETUP_GUIDE.md`.
