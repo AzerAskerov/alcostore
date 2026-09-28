@@ -1,0 +1,3 @@
+# api/.dev.vars kimi kopyala (git-ə düşmür). Yalnız local üçün.
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_ORDERS_CHAT_ID=

@@ -1,0 +1,27 @@
+{
+  "name": "alcostore",
+  "version": "1.0.0",
+  "description": "Alco Store — alkoqollu içkilər mağazası (mobil + veb + admin)",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "api",
+    "alcostore-web",
+    "alcostore-mobile"
+  ],
+  "scripts": {
+    "dev:api": "npm run local --workspace api",
+    "dev:web": "npm run dev --workspace alcostore-web",
+    "dev:mobile": "npm run start --workspace alcostore-mobile",
+    "dev:local": "concurrently -n api,web \"npm run dev:api\" \"npm run dev:web\"",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7"
+  },
+  "license": "UNLICENSED"
+}

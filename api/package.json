@@ -1,0 +1,30 @@
+{
+  "name": "alcostore-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Alco Store API — Cloudflare Workers + Hono + D1 + R2",
+  "main": "src/index.ts",
+  "scripts": {
+    "local": "npm run migrate:local && wrangler dev --env local --local --ip 0.0.0.0 --port 8787",
+    "dev": "wrangler dev --env local --local --port 8787",
+    "deploy:dev": "wrangler deploy --env dev",
+    "deploy:prod": "wrangler deploy",
+    "migrate:local": "wrangler d1 migrations apply DB --local --env local",
+    "migrate:dev": "wrangler d1 migrations apply DB --remote --env dev",
+    "migrate:prod": "wrangler d1 migrations apply DB --remote",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "push:test": "node scripts/send-test-push.mjs"
+  },
+  "dependencies": {
+    "@alcostore/shared": "*",
+    "@tsndr/cloudflare-worker-jwt": "^3.2.0",
+    "hono": "^4.13.10"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250920.0",
+    "typescript": "~5.9.2",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.143.0"
+  }
+}

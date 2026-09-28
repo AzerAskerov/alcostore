@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+msg=$(head -1 "$1")
+if ! echo "$msg" | grep -Eq '^(feat|fix|docs|style|refactor|test|chore|ci|perf|build|revert)(\(.+\))?!?: .+' && ! echo "$msg" | grep -Eq '^(Merge|Revert) '; then
+  echo "✖ Commit mesajı Conventional Commits formatında olmalıdır: feat: ..., fix(api): ..."
+  exit 1
+fi

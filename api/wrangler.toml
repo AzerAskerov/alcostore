@@ -1,0 +1,88 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "alcostore-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
+# ===========================================
+# PRODUCTION (default) — api.alcostore.az
+# ===========================================
+
+[[d1_databases]]
+binding = "DB"
+database_name = "alcostoreDb"
+database_id = "REPLACE_WITH_PROD_D1_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "alcostore-imgs"
+
+[vars]
+ENVIRONMENT = "production"
+API_BASE_URL = "https://api.alcostore.az"
+FRONTEND_URL = "https://alcostore.az"
+R2_PUBLIC_URL = "https://api.alcostore.az/media"
+CORS_ORIGINS = "https://alcostore.az,https://www.alcostore.az"
+
+# Secrets (wrangler secret put <NAME>):
+#   JWT_SECRET            — admin JWT imzası
+#   TELEGRAM_BOT_TOKEN    — @alcostore_bot (admin login + bildirişlər)
+#   ADMIN_TELEGRAM_IDS    — vergüllə ayrılmış Telegram ID-lər (admin whitelist)
+#   TELEGRAM_ORDERS_CHAT_ID (opsional) — sifariş bildirişləri üçün qrup; yoxdursa admin-lərə şəxsən gedir
+#   EXPO_ACCESS_TOKEN     (opsional) — Expo push "enhanced security" aktivdirsə
+
+# ===========================================
+# LOCAL (wrangler dev --env local)
+# ===========================================
+[env.local]
+name = "alcostore-api-local"
+
+[[env.local.d1_databases]]
+binding = "DB"
+database_name = "alcostoreDb-local"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[env.local.r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "alcostore-imgs-local"
+
+[env.local.vars]
+ENVIRONMENT = "local"
+API_BASE_URL = "http://localhost:8787"
+FRONTEND_URL = "http://localhost:3000"
+R2_PUBLIC_URL = "http://localhost:8787/media"
+CORS_ORIGINS = "http://localhost:3000,http://localhost:8081"
+JWT_SECRET = "local-dev-secret-DO-NOT-USE-IN-PRODUCTION"
+# Yalnız local: Telegram-sız admin girişi (POST /admin/auth/dev). Dev/prod-da YOXDUR.
+DEV_LOGIN_ENABLED = "1"
+ADMIN_TELEGRAM_IDS = "0"
+
+# ===========================================
+# CLOUD DEV (wrangler deploy --env dev) — dev-api.alcostore.az
+# ===========================================
+[env.dev]
+name = "alcostore-api-dev"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "alcostoreDb-dev"
+database_id = "REPLACE_WITH_DEV_D1_ID"
+migrations_dir = "migrations"
+
+[[env.dev.r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "alcostore-imgs-dev"
+
+[env.dev.vars]
+ENVIRONMENT = "development"
+API_BASE_URL = "https://dev-api.alcostore.az"
+FRONTEND_URL = "https://dev.alcostore.az"
+R2_PUBLIC_URL = "https://dev-api.alcostore.az/media"
+CORS_ORIGINS = "https://dev.alcostore.az"

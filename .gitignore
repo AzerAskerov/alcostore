@@ -1,0 +1,29 @@
+node_modules/
+.DS_Store
+*.log
+.env.local
+.env*.local
+.dev.vars
+.wrangler/
+.next/
+.open-next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Expo / native
+.expo/
+alcostore-mobile/android/
+alcostore-mobile/ios/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+google-play-key.json
+*service-account*.json
+asc-api-key*.p8
+
+# Local scratch
+.claude/worktrees/
