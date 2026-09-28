@@ -19,6 +19,11 @@
     "lint": "npm run lint --workspaces --if-present",
     "prepare": "husky"
   },
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3"
+  },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "husky": "^9.1.7"
