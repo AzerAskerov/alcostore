@@ -9,9 +9,9 @@
 
 | Nə | Vəziyyət |
 |---|---|
-| Repo | `github.com/AzerAskerov/alcostore` (PUBLIC). Lokal iş `development` branch-ında, **push edilməyib**. `main`-də yalnız köhnə dizayn `index.html` var (GitHub Pages) |
-| Prod API | Cloudflare Worker `alcostore-api` → **https://alco.turmat.az** (custom domain, turmat.az zonası). D1 `alcostoreDb` (migrations 0001–0004), R2 `alcostore-imgs` (26 şəkil). SSL sertifikatı 2026-09-28 ~19:10-da buraxılırdı — Addım 0-da yoxla |
-| Prod veb | **Deploy edilməyib.** Hədəf: `alcoweb.turmat.az` (Worker `alcostore-web`, OpenNext). Play Store üçün privacy/support/data-deletion URL-ləri buradan olacaq |
+| Repo | `github.com/AzerAskerov/alcostore` (PUBLIC). `development` və `main` push olunub (main = prod). Köhnə dizayn `index.html` main-də qalır (GitHub Pages). Secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`; environment `production-mobile` yaradılıb |
+| Prod API | Cloudflare Worker `alcostore-api` → **https://alco.turmat.az** (custom domain, turmat.az zonası). D1 `alcostoreDb` (migrations 0001–0004), R2 `alcostore-imgs` (26 şəkil). SSL OK (Google TS, 2026-12-27-dək, avto-yenilənir). ✅ Addım 0 |
+| Prod veb | ✅ **https://alcoweb.turmat.az** (Worker `alcostore-web`, OpenNext) — GitHub Actions `deploy-web.yml` ilə (main push). Deploy YALNIZ workflow ilə, lokal `wrangler deploy` yox. Privacy/support/data-deletion URL-ləri buradadır |
 | Mobil | Expo SDK 57, `alcostore-mobile/`. EAS layihəsi `@azeraskerov/alcostore` (projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`). Android package `app.alcostore.android`. Heç bir EAS build edilməyib. Lokal Expo Go testi keçib |
 | Hesablar | TurMat-ın Apple / Google Play / Expo (`azeraskerov`) / Cloudflare (account `a151fd414815484846a2be6cbc8b8b48`) hesabları istifadə olunur — yeni hesab açılmır |
 | Son domen | `alcostorebaku.az` (alınma prosesi davam edir). Keçid: wrangler route + EXPO_PUBLIC_API_URL (EAS Update kifayətdir) |
@@ -20,20 +20,20 @@ Dev resursları (`alcostore-api-dev`, `alcostore-web-dev`, `alcostoreDb-dev`, `a
 
 ---
 
-## Addım 0 — Prod API-ni yoxla
+## Addım 0 — Prod API-ni yoxla ✅ (2026-09-28)
 - `curl https://alco.turmat.az/health` → `{"ok":true,"env":"production"}`
 - `/home`: 6 kateqoriya (viski, konyak, araq, pivə, tekila, liker), bannerlər, məhsul şəkilləri `https://alco.turmat.az/media/...` 200 qaytarır.
 - SSL xətası davam edirsə: Cloudflare → Workers → alcostore-api → Domains yoxla.
 - ✅ İstifadəçi "ok" deyir.
 
-## Addım 1 — Prod vebi `alcoweb.turmat.az`-a deploy et
+## Addım 1 — Prod vebi `alcoweb.turmat.az`-a deploy et ✅ (2026-09-28, GitHub Actions ilə)
 - `alcostore-web/wrangler.jsonc`: prod üçün `"routes": [{ "pattern": "alcoweb.turmat.az", "custom_domain": true }]`.
 - Build env: `NEXT_PUBLIC_API_URL=https://alco.turmat.az`, `NEXT_PUBLIC_ENV=production`, `NEXT_PUBLIC_BASE_URL=https://alcoweb.turmat.az`.
 - OpenNext Windows-da rəsmi dəstəklənmir → GitHub Actions (Addım 2) və ya WSL ilə build. `npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy`.
 - Yoxla: `/`, `/privacy`, `/terms`, `/support`, `/data-deletion`, bir `/mehsul/...` səhifəsi.
 - ✅ İstifadəçi brauzerdə baxıb "ok" deyir.
 
-## Addım 2 — GitHub: push + prod-only workflow + secrets
+## Addım 2 — GitHub: push + prod-only workflow + secrets — qismən ✅ (push, prod-only workflow-lar, Cloudflare secrets, `production-mobile` env). Qalan: `EXPO_TOKEN`, `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
 - `development` → `main` (PR və ya birbaşa, istifadəçidən soruş). `main`-dəki köhnə `index.html` (GitHub Pages dizaynı) saxlanılır.
 - Workflow-ları prod-only et (`main`): `.github/workflows/deploy-web.yml`, `deploy-mobile.yml`, `release-mobile-store.yml`, `ci.yml`. URL defoltları: API `https://alco.turmat.az`, veb `https://alcoweb.turmat.az`.
 - Secrets (istifadəçi özü əlavə edir — dəyərləri GitHub-dan oxumaq olmur; TurMat reposundakı eyni dəyərlər):
