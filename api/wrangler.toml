@@ -3,8 +3,8 @@ name = "alcostore-api"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
-# alcostorebaku.az zonası bu Cloudflare hesabına keçəndən sonra açılacaq (docs/INFRA.md):
-# routes = [{ pattern = "api.alcostorebaku.az", custom_domain = true }]
+# Müvəqqəti prod domeni (turmat.az zonası). alcostorebaku.az alınanda buraya əlavə olunacaq.
+routes = [{ pattern = "alco.turmat.az", custom_domain = true }]
 
 [observability.logs]
 enabled = true
@@ -12,7 +12,7 @@ head_sampling_rate = 1
 invocation_logs = true
 
 # ===========================================
-# PRODUCTION (default) — api.alcostorebaku.az
+# PRODUCTION (default) — https://alco.turmat.az (müvəqqəti) → api.alcostorebaku.az
 # ===========================================
 
 [[d1_databases]]
@@ -27,10 +27,10 @@ bucket_name = "alcostore-imgs"
 
 [vars]
 ENVIRONMENT = "production"
-API_BASE_URL = "https://alcostore-api.sigortamat90.workers.dev"
-FRONTEND_URL = "https://alcostore-web.sigortamat90.workers.dev"
-R2_PUBLIC_URL = "https://alcostore-api.sigortamat90.workers.dev/media"
-CORS_ORIGINS = "https://alcostore-web.sigortamat90.workers.dev,https://alcostorebaku.az,https://www.alcostorebaku.az"
+API_BASE_URL = "https://alco.turmat.az"
+FRONTEND_URL = "https://alcoweb.turmat.az"
+R2_PUBLIC_URL = "https://alco.turmat.az/media"
+CORS_ORIGINS = "https://alcoweb.turmat.az,https://alcostorebaku.az,https://www.alcostorebaku.az"
 
 # Secrets (wrangler secret put <NAME>):
 #   JWT_SECRET            — admin JWT imzası
