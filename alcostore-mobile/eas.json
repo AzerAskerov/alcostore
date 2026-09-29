@@ -54,7 +54,7 @@
         "releaseStatus": "draft"
       },
       "ios": {
-        "ascAppId": "REPLACE_WITH_ASC_APP_ID",
+        "ascAppId": "6817231454",
         "bundleIdentifier": "app.alcostore.ios"
       }
     }

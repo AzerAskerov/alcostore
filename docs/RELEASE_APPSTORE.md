@@ -15,8 +15,8 @@
 | iOS konfiq | Bundle `app.alcostore.ios`, `supportsTablet: false`, deploymentTarget 16.4, `ITSAppUsesNonExemptEncryption: false`, `NSUserSupportURL` → `https://alcoweb.turmat.az/support` ✅ (Addım 0-da düzəldildi) |
 | associatedDomains | `applinks:alcostorebaku.az` (+www) — **saxlanılır** (qərar 2026-09-29). Domen alınanda veb-ə AASA qoyulur, yeni build lazım deyil |
 | Push (iOS) | `GoogleService-Info.plist` lazım deyil (Expo push APNs ilə birbaşa). EAS-da TurMat-ın push key-i `K75TWSWA52` (team BU35T35W2N) var — alcostore-a qoşulub ✅ |
-| GitHub | Secrets: `EXPO_TOKEN` ✅; `EXPO_ASC_API_KEY_P8/_ID/_ISSUER_ID` ❌; variable `ASC_APP_ID` ❌ |
-| eas.json | `submit.production.ios.ascAppId` = `REPLACE_WITH_ASC_APP_ID` (Addım 2-də doldurulur) |
+| GitHub | Secrets: `EXPO_TOKEN` ✅; `EXPO_ASC_API_KEY_P8/_ID/_ISSUER_ID` ❌; variable `ASC_APP_ID=6817231454` ✅ |
+| eas.json | `submit.production.ios.ascAppId` = `6817231454` ✅ |
 | Workflow | `release-mobile-store.yml` (platform=ios, ios_release=MANUAL) + `alcostore-mobile/scripts/ascSubmitForReview.mjs` (RELEASE_TYPE defolt MANUAL) hazırdır |
 | EAS build | iOS üçün heç bir build edilməyib |
 
@@ -48,8 +48,8 @@
   - ✅ Push key `K75TWSWA52` (TurMat-ın, team BU35T35W2N) qoşuldu
 - ✅ `eas credentials -p ios` hamısını göstərir, istifadəçi "ok".
 
-## Addım 2 — App Store Connect app qeydi (istifadəçi yaradır)
-- My Apps → + New App: iOS, ad **Alco Store** (tutulubsa **Alco Store Bakı**), primary language Azerbaijani (yoxdursa English), bundle `app.alcostore.ios`, SKU `alcostore-ios`, Full Access.
+## Addım 2 — App Store Connect app qeydi (istifadəçi yaradır) ✅ (2026-09-29, ASC App ID `6817231454`)
+- ✅ Yaradıldı: ad **Alco Store**, primary language **English (U.S.)** (Azerbaijani siyahıda yoxdur — az mətnlər sonra lokalizasiya kimi), bundle `app.alcostore.ios`, SKU `alcostore-ios`, Full Access.
 - App Information → Apple ID (rəqəm) → `gh variable set ASC_APP_ID -R AzerAskerov/alcostore --body <ID>` və `eas.json` `submit.production.ios.ascAppId`.
 - ✅ İstifadəçi "ok".
 
