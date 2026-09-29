@@ -14,7 +14,7 @@
 | Hesablar | Apple Developer: TurMat-ın hesabı — faktiki Team **`BU35T35W2N`** (TurMat prod `app.turmat.ios` da bu team-dədir; TurMat docs-dakı `UVU22NWY28` köhnədir). Expo `azeraskerov`, EAS projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`. Yeni hesab açılmır |
 | iOS konfiq | Bundle `app.alcostore.ios`, `supportsTablet: false`, deploymentTarget 16.4, `ITSAppUsesNonExemptEncryption: false`, `NSUserSupportURL` → `https://alcoweb.turmat.az/support` ✅ (Addım 0-da düzəldildi) |
 | associatedDomains | `applinks:alcostorebaku.az` (+www) — **saxlanılır** (qərar 2026-09-29). Domen alınanda veb-ə AASA qoyulur, yeni build lazım deyil |
-| Push (iOS) | `GoogleService-Info.plist` lazım deyil (Expo push APNs ilə birbaşa). EAS-da TurMat-ın push key-i `K75TWSWA52` (team BU35T35W2N) var — alcostore-a hələ qoşulmayıb ❌ |
+| Push (iOS) | `GoogleService-Info.plist` lazım deyil (Expo push APNs ilə birbaşa). EAS-da TurMat-ın push key-i `K75TWSWA52` (team BU35T35W2N) var — alcostore-a qoşulub ✅ |
 | GitHub | Secrets: `EXPO_TOKEN` ✅; `EXPO_ASC_API_KEY_P8/_ID/_ISSUER_ID` ❌; variable `ASC_APP_ID` ❌ |
 | eas.json | `submit.production.ios.ascAppId` = `REPLACE_WITH_ASC_APP_ID` (Addım 2-də doldurulur) |
 | Workflow | `release-mobile-store.yml` (platform=ios, ios_release=MANUAL) + `alcostore-mobile/scripts/ascSubmitForReview.mjs` (RELEASE_TYPE defolt MANUAL) hazırdır |
@@ -34,7 +34,7 @@
 - `.env.local` gitignore-dadır → EAS-a yüklənmir; prod build `eas.json` env-dən `https://alco.turmat.az` götürür.
 - ✅ İstifadəçi "ok".
 
-## Addım 1 — Apple: bundle ID, sertifikat, profile, APNs (EAS remote credentials)
+## Addım 1 — Apple: bundle ID, sertifikat, profile, APNs (EAS remote credentials) ✅ (2026-09-29)
 - ⚠️ Təsdiq al (Apple Developer-də resurs yaradılır).
 - `cd alcostore-mobile && eas credentials -p ios` → production → istifadəçi Apple ID ilə interaktiv login (parolu istifadəçi özü yazır).
   - Bundle ID `app.alcostore.ios` qeydiyyatı (+ Push Notifications, Associated Domains capability).
@@ -45,7 +45,7 @@
   - ✅ Bundle ID `app.alcostore.ios`
   - ✅ Distribution cert `JRWQSGB7F9` (serial `1D5CD175…`, TurMat ilə eyni, 2027-02-20-dək)
   - ✅ Provisioning profile `HD5G44TR83` (APP_STORE, active, 2027-02-20-dək)
-  - ❌ Push key — `K75TWSWA52` qoşulmalıdır
+  - ✅ Push key `K75TWSWA52` (TurMat-ın, team BU35T35W2N) qoşuldu
 - ✅ `eas credentials -p ios` hamısını göstərir, istifadəçi "ok".
 
 ## Addım 2 — App Store Connect app qeydi (istifadəçi yaradır)
