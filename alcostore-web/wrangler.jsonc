@@ -9,10 +9,13 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
-  // Müvəqqəti prod domeni (turmat.az zonası) — alcostorebaku.az alınana qədər
-  "routes": [{ "pattern": "alcoweb.turmat.az", "custom_domain": true }],
-  // alcostorebaku.az zonası bu hesaba keçəndən sonra:
-  // "routes": [{ "pattern": "alcostorebaku.az", "custom_domain": true }, { "pattern": "www.alcostorebaku.az", "custom_domain": true }],
+  // alcostorebaku.az — əsas domen. alcoweb.turmat.az AKTİV QALIR: store-lara verilmiş privacy/support/
+  // data-deletion linkləri oradadır. Hər iki domen eyni Worker-i göstərir.
+  "routes": [
+    { "pattern": "alcostorebaku.az", "custom_domain": true },
+    { "pattern": "www.alcostorebaku.az", "custom_domain": true },
+    { "pattern": "alcoweb.turmat.az", "custom_domain": true }
+  ],
   "env": {
     "dev": {
       "name": "alcostore-web-dev",
