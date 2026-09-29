@@ -41,6 +41,11 @@
   - Distribution certificate: TurMat-ın mövcud sertifikatını təkrar istifadə et (team limiti 2-3).
   - Provisioning profile (App Store).
   - Push key: TurMat komandasının mövcud `.p8` APNs key-i (team səviyyəli) seç — `TurMat/docs/APNS_SETUP_GUIDE.md`.
+- Vəziyyət (2026-09-29, EAS GraphQL ilə yoxlanıldı):
+  - ✅ Bundle ID `app.alcostore.ios`
+  - ✅ Distribution cert `JRWQSGB7F9` (serial `1D5CD175…`, TurMat ilə eyni, 2027-02-20-dək)
+  - ✅ Provisioning profile `HD5G44TR83` (APP_STORE, active, 2027-02-20-dək)
+  - ❌ Push key — `K75TWSWA52` qoşulmalıdır
 - ✅ `eas credentials -p ios` hamısını göstərir, istifadəçi "ok".
 
 ## Addım 2 — App Store Connect app qeydi (istifadəçi yaradır)
