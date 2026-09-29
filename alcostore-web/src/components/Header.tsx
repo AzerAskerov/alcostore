@@ -2,16 +2,24 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { MessageCircle, Search, ShoppingBag } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { whatsappUrl, type Category, type StoreSettings } from '@alcostore/shared'
 import { useCart } from '@/lib/cart'
 
 export function Header({ settings, categories }: { settings: StoreSettings; categories: Category[] }) {
   const { count, ready } = useCart()
   const router = useRouter()
+  const pathname = usePathname()
+  const activeSlug = pathname.startsWith('/kateqoriya/') ? decodeURIComponent(pathname.split('/')[2] ?? '') : null
+  const mobileNavRef = useRef<HTMLElement>(null)
   const [q, setQ] = useState('')
+
+  useEffect(() => {
+    const el = mobileNavRef.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    el?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [activeSlug])
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bar/95 backdrop-blur">
@@ -26,7 +34,12 @@ export function Header({ settings, categories }: { settings: StoreSettings; cate
 
         <nav className="hidden flex-1 items-center gap-6 text-sm text-text3 lg:flex">
           {categories.map((c) => (
-            <Link key={c.id} href={`/kateqoriya/${c.slug}`} className="transition hover:text-gold">
+            <Link
+              key={c.id}
+              href={`/kateqoriya/${c.slug}`}
+              aria-current={c.slug === activeSlug ? 'page' : undefined}
+              className={`transition hover:text-gold ${c.slug === activeSlug ? 'font-semibold text-gold' : ''}`}
+            >
               {c.name_az}
             </Link>
           ))}
@@ -73,9 +86,14 @@ export function Header({ settings, categories }: { settings: StoreSettings; cate
           </Link>
         </div>
       </div>
-      <nav className="scrollbar-none flex gap-2 overflow-x-auto px-4 pb-3 lg:hidden">
+      <nav ref={mobileNavRef} className="scrollbar-none flex gap-2 overflow-x-auto px-4 pb-3 lg:hidden">
         {categories.map((c) => (
-          <Link key={c.id} href={`/kateqoriya/${c.slug}`} className="shrink-0 rounded-full border border-line px-4 py-1.5 text-sm text-text3">
+          <Link
+            key={c.id}
+            href={`/kateqoriya/${c.slug}`}
+            aria-current={c.slug === activeSlug ? 'page' : undefined}
+            className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition ${c.slug === activeSlug ? 'bg-red text-on-red' : 'border border-line text-text3'}`}
+          >
             {c.name_az}
           </Link>
         ))}
