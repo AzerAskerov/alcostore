@@ -3,8 +3,12 @@ name = "alcostore-api"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
-# Müvəqqəti prod domeni (turmat.az zonası). alcostorebaku.az alınanda buraya əlavə olunacaq.
-routes = [{ pattern = "alco.turmat.az", custom_domain = true }]
+# api.alcostorebaku.az — əsas domen. alco.turmat.az AKTİV QALIR: review-dakı/quraşdırılmış build-lər ona baxır
+# (EAS Update ilə yeni domenə keçəndən və köhnə build-lər sıradan çıxandan sonra silinə bilər).
+routes = [
+  { pattern = "api.alcostorebaku.az", custom_domain = true },
+  { pattern = "alco.turmat.az", custom_domain = true },
+]
 
 [observability.logs]
 enabled = true
@@ -12,7 +16,9 @@ head_sampling_rate = 1
 invocation_logs = true
 
 # ===========================================
-# PRODUCTION (default) — https://alco.turmat.az (müvəqqəti) → api.alcostorebaku.az
+# PRODUCTION (default) — https://api.alcostorebaku.az (+ köhnə https://alco.turmat.az)
+# API_BASE_URL / R2_PUBLIC_URL hələ alco.turmat.az-dır: şəkil linkləri hər iki domendə işləyir,
+# yeni domenə tətbiq EAS Update aldıqdan sonra keçiriləcək.
 # ===========================================
 
 [[d1_databases]]
@@ -28,7 +34,7 @@ bucket_name = "alcostore-imgs"
 [vars]
 ENVIRONMENT = "production"
 API_BASE_URL = "https://alco.turmat.az"
-FRONTEND_URL = "https://alcoweb.turmat.az"
+FRONTEND_URL = "https://alcostorebaku.az"
 R2_PUBLIC_URL = "https://alco.turmat.az/media"
 CORS_ORIGINS = "https://alcoweb.turmat.az,https://alcostorebaku.az,https://www.alcostorebaku.az"
 

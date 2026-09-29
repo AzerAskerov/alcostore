@@ -4,8 +4,9 @@ name: Deploy Web + API to Cloudflare
 # Sıra: API bundle dry-run → D1 migrations → API Worker deploy → web (OpenNext) build → web Worker deploy → smoke test.
 # Web build API deploy-dan SONRA gedir ki, web xətası API düzəlişlərini saxlamasın (TurMat dərsi).
 #
-# Web build URL-ləri repo dəyişənlərindən (Settings → Variables): PROD_API_URL, PROD_WEB_URL.
-# Defolt müvəqqəti turmat.az domenləridir; alcostorebaku.az qoşulanda yalnız dəyişənlər yenilənir.
+# Domenlər (2026-09-29): əsas alcostorebaku.az / api.alcostorebaku.az; köhnə alcoweb.turmat.az / alco.turmat.az
+# AKTİV QALIR (store-lardakı linklər və review-dakı build-lər onlara baxır). Hər ikisi eyni Worker-lərdir.
+# Repo dəyişənləri defoltları əvəz edir: PROD_API_URL (vebin API-si), PROD_BASE_URL (canonical), PROD_WEB_URL (köhnə smoke).
 # API-nin öz URL/CORS dəyərləri api/wrangler.toml [vars]-dadır (tək mənbə) — burada override edilmir.
 
 on:
@@ -43,6 +44,8 @@ jobs:
           echo "environment=production" >> $GITHUB_OUTPUT
           echo "api_url=${{ vars.PROD_API_URL || 'https://alco.turmat.az' }}" >> $GITHUB_OUTPUT
           echo "web_url=${{ vars.PROD_WEB_URL || 'https://alcoweb.turmat.az' }}" >> $GITHUB_OUTPUT
+          echo "base_url=${{ vars.PROD_BASE_URL || 'https://alcostorebaku.az' }}" >> $GITHUB_OUTPUT
+          echo "new_api_url=https://api.alcostorebaku.az" >> $GITHUB_OUTPUT
           echo "telegram_bot=${{ vars.TELEGRAM_BOT_USERNAME_PROD }}" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v4
@@ -73,7 +76,8 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ steps.env.outputs.api_url }}
           NEXT_PUBLIC_ENV: ${{ steps.env.outputs.environment }}
-          NEXT_PUBLIC_BASE_URL: ${{ steps.env.outputs.web_url }}
+          # canonical/sitemap/robots yeni domenə baxır; köhnə domen eyni səhifələri göstərir
+          NEXT_PUBLIC_BASE_URL: ${{ steps.env.outputs.base_url }}
           NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${{ steps.env.outputs.telegram_bot }}
           NEXT_PUBLIC_APP_STORE_URL: ${{ vars.APP_STORE_URL }}
           NEXT_PUBLIC_PLAY_STORE_URL: ${{ vars.PLAY_STORE_URL }}
@@ -83,8 +87,8 @@ jobs:
         working-directory: alcostore-web
         run: npx opennextjs-cloudflare deploy
 
-      # TurMat-dakı "boş səhifə deploy olunmasın" qapısının sadə forması
-      - name: Smoke test
+      # TurMat-dakı "boş səhifə deploy olunmasın" qapısının sadə forması — köhnə (store-lara verilmiş) domenlər SƏRT yoxlanılır
+      - name: Smoke test (existing domains)
         run: |
           set -e
           api=$(curl -s -o /dev/null -w '%{http_code}' ${{ steps.env.outputs.api_url }}/health)
@@ -93,10 +97,30 @@ jobs:
           n=$(grep -o '/mehsul/[a-z0-9-]*' home.html | sort -u | wc -l)
           echo "Web / → $(wc -c < home.html) bytes, $n məhsul linki"
           test "$n" -ge 3
+          for p in privacy terms support data-deletion; do
+            c=$(curl -s -o /dev/null -w '%{http_code}' ${{ steps.env.outputs.web_url }}/$p)
+            echo "/$p → $c"; test "$c" = "200"
+          done
+
+      # Yeni custom domenlərin SSL-i ilk deploy-da bir neçə dəqiqə buraxılır — gözləyirik, alınmasa xəbərdarlıq
+      - name: Smoke test (alcostorebaku.az)
+        run: |
+          check() {
+            for i in $(seq 1 30); do
+              c=$(curl -s -o /dev/null -w '%{http_code}' "$1" || true)
+              [ "$c" = "200" ] && { echo "✅ $1 → 200"; return 0; }
+              sleep 10
+            done
+            echo "::warning::$1 hələ cavab vermir (son kod: $c) — SSL/DNS buraxılışını Cloudflare-də yoxlayın"
+          }
+          check ${{ steps.env.outputs.new_api_url }}/health
+          check ${{ steps.env.outputs.base_url }}/
+          check ${{ steps.env.outputs.base_url }}/privacy
+          check https://www.alcostorebaku.az/
 
       - name: Summary
         run: |
           echo "### 🚀 ${{ steps.env.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Web: ${{ steps.env.outputs.web_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- API: ${{ steps.env.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Web: ${{ steps.env.outputs.base_url }} (+ köhnə ${{ steps.env.outputs.web_url }})" >> $GITHUB_STEP_SUMMARY
+          echo "- API: ${{ steps.env.outputs.new_api_url }} (+ köhnə ${{ steps.env.outputs.api_url }})" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
