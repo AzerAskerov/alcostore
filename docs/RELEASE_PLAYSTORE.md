@@ -49,12 +49,12 @@ Dev resursları (`alcostore-api-dev`, `alcostore-web-dev`, `alcostoreDb-dev`, `a
 - Push (FCM): Firebase layihəsi → `google-services.json` (package `app.alcostore.android`) + FCM V1 service account açarını EAS-a yüklə. Bax: `TurMat/docs/FCM_SETUP_GUIDE.md`.
 - ✅ `eas credentials` və `eas env`/config yoxlanılır, istifadəçi "ok".
 
-## Addım 4 — EAS production build (Android AAB)
+## Addım 4 — EAS production build (Android AAB) ✅ (2026-09-28: versionCode 2, 1.0.0)
 - İstifadəçidən təsdiq al → `eas build --profile production --platform android`.
 - Build linkini ver; AAB-ni endir (ilk yükləmə əl ilə olacaq).
 - ✅ Build FINISHED, istifadəçi "ok".
 
-## Addım 5 — Play Console: app yarat və "App content"
+## Addım 5 — Play Console: app yarat və "App content" ✅ (2026-09-29: app 4973711960578049659, personal hesab → closed test məcburi; IARC 18+)
 - İstifadəçi yaradır: app adı **Alco Store**, package `app.alcostore.android`, pulsuz, "App".
 - Hesab tipini yoxla: personal və 2023-11-13-dən sonra açılıbsa → production-dan əvvəl **12 tester × 14 gün closed test** (docs/PLAN.md §7.5).
 - App content (hazır cavablar):
@@ -65,12 +65,12 @@ Dev resursları (`alcostore-api-dev`, `alcostore-web-dev`, `alcostoreDb-dev`, `a
   - Government / financial / health: yox
 - ✅ Hamısı "Completed", istifadəçi "ok".
 
-## Addım 6 — Store listing materialları
+## Addım 6 — Store listing materialları ✅ (2026-09-29: store-assets/, telefon + tablet 7"/10" screenshot-ları)
 - Başlıq: `Alco Store — Şərab evi` · Qısa təsvir (≤80) · Tam təsvir (az, en) — məsuliyyətli istehlak dili, "həddindən artıq içki" yox.
 - İkon 512×512 (`scripts/make-assets.mjs` genişləndir), feature graphic 1024×500, telefon screenshot-ları (≥2, 9:16). TurMat nümunəsi: `C:\Users\asgaroff\Documents\turmatpartner\make_*_screenshots.ps1`.
 - ✅ İstifadəçi materiallara baxıb "ok".
 
-## Addım 7 — İlk AAB yükləmə + test track
+## Addım 7 — İlk AAB yükləmə + test track — davam edir (2026-09-29: internal testing yayımlandı; closed test Alpha: testers-community@googlegroups.com, 178 ölkə; 15 dəyişiklik review-da, managed publishing OFF)
 - İlk AAB Play Console-a **əl ilə** (Google API ilə ilk yükləməyə icazə vermir) → Internal testing.
 - Service account (TurMat-dakı) Play Console → Users & permissions-də yeni app-a icazə alır → sonrakı yükləmələr `release-mobile-store.yml` ilə.
 - Closed testing (lazımdırsa 12 tester) → production review, **Managed publishing** aktiv (təsdiqdən sonra əl ilə açılır).
