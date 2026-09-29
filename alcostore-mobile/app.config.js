@@ -42,7 +42,7 @@ const config = {
   icon: IS_DEV ? './assets/icon-dev.png' : './assets/icon.png',
   userInterfaceStyle: 'dark',
   backgroundColor: '#0E0C0B',
-  platforms: ['ios', 'android', 'web'],
+  platforms: ['ios', 'android'],
   ios: {
     bundleIdentifier: IS_DEV ? 'app.alcostore.ios.dev' : 'app.alcostore.ios',
     supportsTablet: false,

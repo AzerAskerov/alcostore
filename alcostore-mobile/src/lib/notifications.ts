@@ -12,7 +12,7 @@ type NotificationsModule = typeof import('expo-notifications')
  * Ona görə modulu yalnız dev/store build-də tənbəl (lazy) yükləyirik; Expo Go-da push sadəcə söndürülür,
  * qalan hər şey işləyir.
  */
-export const PUSH_SUPPORTED = !isRunningInExpoGo() && Platform.OS !== 'web'
+export const PUSH_SUPPORTED = !isRunningInExpoGo()
 
 let mod: NotificationsModule | null | undefined
 function N(): NotificationsModule | null {
