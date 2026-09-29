@@ -69,8 +69,8 @@ gh secret set EXPO_ASC_API_KEY_ISSUER_ID -R AzerAskerov/alcostore
 - ⚠️ Təsdiq al → `release-mobile-store.yml` (platform=ios, ios_release=MANUAL) və ya `eas build -p ios --profile production`.
 - ✅ Build FINISHED, istifadəçi "ok".
 
-## Addım 5 — Submit → TestFlight (internal)
-- ⚠️ Təsdiq al → `eas submit -p ios --profile production` (workflow bunu özü edir).
+## Addım 5 — Submit → TestFlight (internal) ✅ (2026-09-29: EAS submission `42f5bbc3`, ASC build `27617601` VALID; internal qrup "Internal", tester turmat2025@gmail.com — fiziki iPhone testi istifadəçidə)
+- `eas submit` non-interactive rejimdə ASC API key-i yalnız `eas.json`-dan götürür (env dəyişənləri kifayət etmir) → lokal submit üçün `ascApiKeyPath/Id/IssuerId/appleTeamId` müvəqqəti əlavə edilib, sonra geri qaytarılıb (workflow da eyni şeyi edir).
 - İstifadəçi fiziki iPhone-da TestFlight ilə yoxlayır: yaş təsdiqi, kataloq, səbət → WhatsApp, push bildiriş (admin panel və ya API `/admin/notifications`).
 - ✅ İstifadəçi "ok".
 
@@ -84,7 +84,7 @@ gh secret set EXPO_ASC_API_KEY_ISSUER_ID -R AzerAskerov/alcostore
 - Review Notes: "Alcohol store with delivery in Baku. No account required. Age gate at launch. Orders are sent via WhatsApp; payment on delivery; no in-app purchases."
 - ✅ İstifadəçi "ok".
 
-## Addım 7 — App Review-a göndər (releaseType MANUAL)
+## Addım 7 — App Review-a göndər (releaseType MANUAL) ✅ göndərildi (2026-09-29, reviewSubmission `355b6bf4`, WAITING_FOR_REVIEW)
 - ⚠️ Təsdiq al → `ascSubmitForReview.mjs` (`RELEASE_TYPE=MANUAL`) — workflow ilə.
 - Təsdiqdən sonra "Pending Developer Release"; real data hazır olanda istifadəçi əl ilə açır.
 - ✅ İstifadəçi "ok".
