@@ -67,8 +67,11 @@ jobs:
           EXPO_PUBLIC_WEB_URL: ${{ steps.changes.outputs.web_url }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          eas update --branch ${{ steps.changes.outputs.channel }} --message "${COMMIT_MSG%%$'\n'*}" --platform android --non-interactive
-          eas update --branch ${{ steps.changes.outputs.channel }} --message "${COMMIT_MSG%%$'\n'*}" --platform ios --non-interactive
+          # workflow_dispatch-da head_commit yoxdur → son commit başlığı
+          MSG="${COMMIT_MSG%%$'\n'*}"
+          [ -n "$MSG" ] || MSG="$(git log -1 --pretty=%s)"
+          eas update --branch ${{ steps.changes.outputs.channel }} --message "$MSG" --platform android --non-interactive
+          eas update --branch ${{ steps.changes.outputs.channel }} --message "$MSG" --platform ios --non-interactive
 
       - name: Warn about native changes
         if: steps.changes.outputs.native == 'true'
