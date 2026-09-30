@@ -1,4 +1,5 @@
 import { Image } from 'expo-image'
+import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 import { Bell, Search, X } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
@@ -71,11 +72,15 @@ export default function Home() {
             accessibilityRole="button"
           >
             {b.image_url ? <Image source={{ uri: b.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" /> : null}
-            <View style={s.promoShade}>
+            <LinearGradient
+              colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.85)']}
+              locations={[0, 0.45, 1]}
+              style={s.promoShade}
+            >
               {b.kicker ? <T variant="kicker">{b.kicker}</T> : null}
               <T style={s.promoTitle}>{b.title}</T>
               {b.subtitle ? <T variant="small">{b.subtitle}</T> : null}
-            </View>
+            </LinearGradient>
           </Pressable>
         ))}
 
@@ -131,7 +136,7 @@ const s = StyleSheet.create({
   store: { fontFamily: font.bold, fontSize: 17, letterSpacing: 0.5 },
   search: { height: 44, borderRadius: radii.input, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14 },
   promo: { borderRadius: radii.card, borderWidth: 1, borderColor: 'rgba(227,30,36,0.45)', backgroundColor: colors.redDeep2, minHeight: 150, overflow: 'hidden', justifyContent: 'flex-end', marginBottom: 12 },
-  promoShade: { padding: 18, paddingTop: 36, gap: 4, backgroundColor: 'rgba(0,0,0,0.55)' },
+  promoShade: { padding: 18, paddingTop: 56, gap: 4 },
   promoTitle: { fontFamily: font.serif, fontSize: 24, lineHeight: 28 },
   pushCard: { borderRadius: radii.card, borderWidth: 1, borderColor: colors.goldBorder, backgroundColor: colors.surface, padding: 16, marginBottom: 12 },
   sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 12, marginBottom: 12 },
