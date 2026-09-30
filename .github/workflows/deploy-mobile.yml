@@ -5,12 +5,20 @@ name: Deploy Mobile (EAS Update)
 # native fayllar dəyişibsə → update YOX, "manual EAS build lazımdır" xəbərdarlığı.
 # Dev mühiti YOXDUR — yalnız production kanalı.
 #
-# Hələlik yalnız əl ilə (workflow_dispatch): ilk production EAS build-dən (Play Store Addım 4) əvvəl
-# update göndərməyin mənası yoxdur. Build-dən sonra push trigger-i açılacaq:
-#   push: { branches: [main], paths: ['alcostore-mobile/**', 'packages/shared/**', '.github/workflows/deploy-mobile.yml'] }
+# Production build artıq store-dadır → main-ə push olanda avtomatik işləyir (əl ilə də işə salmaq olar).
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'alcostore-mobile/**'
+      - 'packages/shared/**'
+      - '.github/workflows/deploy-mobile.yml'
   workflow_dispatch: {}
+
+concurrency:
+  group: deploy-mobile
+  cancel-in-progress: false
 
 jobs:
   smart-deploy:
@@ -23,13 +31,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Detect changes
         id: changes
         run: |
           NATIVE="alcostore-mobile/(package\.json|app\.config\.js|eas\.json|assets/|plugins/)"
-          CHANGED=$(git diff --name-only HEAD~1 HEAD || true)
+          # Push-dakı BÜTÜN commit-lər yoxlanır (yalnız sonuncu yox); əl ilə işə salanda — son commit
+          BEFORE="${{ github.event.before }}"
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$BEFORE" 2>/dev/null; then
+            CHANGED=$(git diff --name-only "$BEFORE" HEAD || true)
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD || true)
+          fi
           echo "$CHANGED"
           if echo "$CHANGED" | grep -Eq "$NATIVE"; then
             echo "native=true" >> $GITHUB_OUTPUT
