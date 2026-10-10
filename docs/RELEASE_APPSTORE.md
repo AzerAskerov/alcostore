@@ -10,10 +10,10 @@
 
 | Nə | Vəziyyət |
 |---|---|
-| Prod API / veb | ✅ https://alco.turmat.az/health → `{"ok":true,"env":"production"}`; https://alcoweb.turmat.az — `/privacy`, `/support`, `/data-deletion` 200 |
+| Prod API / veb | ✅ https://api.alcostorebaku.az/health → `{"ok":true,"env":"production"}`; https://alcostorebaku.az — `/privacy`, `/support`, `/data-deletion` 200 |
 | Hesablar | Apple Developer: TurMat-ın hesabı — faktiki Team **`BU35T35W2N`** (TurMat prod `app.turmat.ios` da bu team-dədir; TurMat docs-dakı `UVU22NWY28` köhnədir). Expo `azeraskerov`, EAS projectId `100319b1-a3a2-46cd-9d72-ec96408f968e`. Yeni hesab açılmır |
-| iOS konfiq | Bundle `app.alcostore.ios`, `supportsTablet: false`, deploymentTarget 16.4, `ITSAppUsesNonExemptEncryption: false`, `NSUserSupportURL` → `https://alcoweb.turmat.az/support` ✅ (Addım 0-da düzəldildi) |
-| associatedDomains | `applinks:alcostorebaku.az` (+www) — **saxlanılır** (qərar 2026-09-29). Domen alınanda veb-ə AASA qoyulur, yeni build lazım deyil |
+| iOS konfiq | Bundle `app.alcostore.ios`, `supportsTablet: false`, deploymentTarget 16.4, `ITSAppUsesNonExemptEncryption: false`, `NSUserSupportURL` → `https://alcostorebaku.az/support` (⚠️ `app.config.js`-də hələ köhnə `alcoweb.turmat.az/support` — native dəyişiklikdir, növbəti build-də yenilə) |
+| associatedDomains | `applinks:alcostorebaku.az` (+www) — **saxlanılır** (qərar 2026-09-29). Domen artıq aktivdir — veb-ə AASA qoyulur, yeni build lazım deyil |
 | Push (iOS) | `GoogleService-Info.plist` lazım deyil (Expo push APNs ilə birbaşa). EAS-da TurMat-ın push key-i `K75TWSWA52` (team BU35T35W2N) var — alcostore-a qoşulub ✅ |
 | GitHub | Secrets: `EXPO_TOKEN` ✅; `EXPO_ASC_API_KEY_P8/_ID/_ISSUER_ID` ✅ (ASC API key `RU83TVBK4U` "IosApiKey", issuer `de1b4c79-…`, TurMat ilə eyni); variable `ASC_APP_ID=6817231454` ✅ |
 | eas.json | `submit.production.ios.ascAppId` = `6817231454` ✅ |
@@ -32,9 +32,9 @@
 
 ## Addım 0 — Vəziyyəti yoxla + native düzəlişlər ✅ (2026-09-29, associatedDomains saxlanılır)
 - Prod API/veb canlıdır (yuxarıdakı cədvəl).
-- `app.config.js`: `NSUserSupportURL` → `https://alcoweb.turmat.az/support` (native dəyişiklik, build-dən əvvəl).
+- `app.config.js`: `NSUserSupportURL` → `https://alcostorebaku.az/support` (native dəyişiklik, build-dən əvvəl; hazırda kodda hələ `alcoweb.turmat.az`).
 - `associatedDomains` `alcostorebaku.az`-a baxır — ya saxla (domen alınanda veb-də AASA faylı qoyulan kimi işə düşür, yeni build lazım deyil; o vaxta qədər zərərsizdir), ya da çıxar (sonra əlavə etmək yeni native build tələb edir).
-- `.env.local` gitignore-dadır → EAS-a yüklənmir; prod build `eas.json` env-dən `https://alco.turmat.az` götürür.
+- `.env.local` gitignore-dadır → EAS-a yüklənmir; prod build `eas.json` env-dən API URL-i götürür (hazırda hələ köhnə `https://alco.turmat.az`; hədəf `https://api.alcostorebaku.az`).
 - ✅ İstifadəçi "ok".
 
 ## Addım 1 — Apple: bundle ID, sertifikat, profile, APNs (EAS remote credentials) ✅ (2026-09-29)
@@ -77,7 +77,7 @@ gh secret set EXPO_ASC_API_KEY_ISSUER_ID -R AzerAskerov/alcostore
 ## Addım 6 — App Store məlumatları ✅ (2026-09-29, ASC API + App Privacy brauzerdə)
 - Age rating: **18+** (Alcohol, Tobacco, or Drug Use or References: Frequent).
 - App Privacy: Identifiers → Device ID (App Functionality, istifadəçiyə bağlı deyil); Purchases / Other User Content → sifariş tərkibi (App Functionality); Tracking: **YOX**.
-- Privacy Policy URL `https://alcoweb.turmat.az/privacy`, Support URL `https://alcoweb.turmat.az/support`.
+- Privacy Policy URL `https://alcostorebaku.az/privacy`, Support URL `https://alcostorebaku.az/support`.
 - Kateqoriya: Shopping (secondary Food & Drink).
 - Mətnlər az/en — məsuliyyətli istehlak dili. Əlaqə: WhatsApp +994 50 682 21 71, Asif Məhərrəmov küç. 33A, Instagram @alcostore.baku.
 - Screenshot-lar: 6.9" iPhone 1320×2868, ≥3 (iPad lazım deyil).
