@@ -191,7 +191,7 @@ Seed yalnız dev və ilk prod üçündür. Real data gələndə admin paneldən 
 | **Firebase** | yeni layihə `alcostore` → `google-services.json`, `GoogleService-Info.plist`, FCM V1 service account → EAS | — |
 | **Cloudflare** | eyni hesab: Workers (`alcostore-api`, `alcostore-api-dev`), Pages (`alcostore-web`, `alcostore-web-dev`), D1, R2, DNS, Tunnel | domen Cloudflare DNS-ə keçməlidir |
 | **Domen** | `alcostorebaku.az` (dizayndakı) → `api.`, `dev.`, `dev-api.`, `cdn.`, `cdn-dev.`, `local-*` | ❓ alınıb? |
-| **Telegram** | yeni botlar: `@alcostore_bot` (prod), `@alcostore_dev_bot`, `@alcostore_local_bot` + BotFather `/setdomain` | admin login + bildirişlər |
+| **Telegram** | ✅ `@Alcostorebakubot` (prod, `/setdomain` = alcostorebaku.az; secret-lər + `TELEGRAM_BOT_USERNAME_PROD` 2026-10-10 təyin olundu) | admin login + bildirişlər |
 | **WhatsApp** | mağazanın real nömrəsi (WhatsApp Business tövsiyə olunur) | ❓ nömrə |
 
 **Adlandırma (eyniadlılığın qarşısını almaq üçün):**

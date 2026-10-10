@@ -40,7 +40,7 @@ CORS_ORIGINS = "https://alcoweb.turmat.az,https://alcostorebaku.az,https://www.a
 
 # Secrets (wrangler secret put <NAME>):
 #   JWT_SECRET            — admin JWT imzası
-#   TELEGRAM_BOT_TOKEN    — @alcostore_bot (admin login + bildirişlər)
+#   TELEGRAM_BOT_TOKEN    — @Alcostorebakubot (admin login + bildirişlər; BotFather /setdomain = alcostorebaku.az)
 #   ADMIN_TELEGRAM_IDS    — vergüllə ayrılmış Telegram ID-lər (admin whitelist)
 #   TELEGRAM_ORDERS_CHAT_ID (opsional) — sifariş bildirişləri üçün qrup; yoxdursa admin-lərə şəxsən gedir
 #   EXPO_ACCESS_TOKEN     (opsional) — Expo push "enhanced security" aktivdirsə
