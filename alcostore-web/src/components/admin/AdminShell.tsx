@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Bell, Image as ImageIcon, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Tags } from 'lucide-react'
+import { Image as ImageIcon, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Tags } from 'lucide-react'
 import { useEffect } from 'react'
 import { setToken, TOKEN_KEY } from '@/lib/admin-api'
 import { useLocalValue } from '@/lib/local-store'
@@ -14,7 +14,6 @@ const NAV = [
   { href: '/admin/products', label: 'Məhsullar', icon: Package },
   { href: '/admin/categories', label: 'Kateqoriyalar', icon: Tags },
   { href: '/admin/banners', label: 'Bannerlər', icon: ImageIcon },
-  { href: '/admin/notifications', label: 'Bildirişlər', icon: Bell },
   { href: '/admin/settings', label: 'Ayarlar', icon: Settings },
 ]
 
